@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+.expo/
+dist/
+build/
+coverage/
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p8
+*.p12
+*.pem
+ios/Pods/
+android/.gradle/
+android/local.properties

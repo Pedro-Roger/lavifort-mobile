@@ -1,0 +1,161 @@
+{
+  "project": "larvifort-mobile",
+  "version": 1,
+  "tasks": [
+    {
+      "id": "MOB-001",
+      "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design",
+      "priority": 1,
+      "status": "pending",
+      "dependsOn": [],
+      "acceptanceCriteria": [
+        "Projeto Expo configurado com TypeScript e Expo Router",
+        "Tokens de design system (cores brand-600 #0284c7, background #fcfcfd, status badges) configurados",
+        "Scripts de lint, typecheck e build configurados no package.json"
+      ]
+    },
+    {
+      "id": "MOB-002",
+      "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API",
+      "priority": 2,
+      "status": "pending",
+      "dependsOn": ["MOB-001"],
+      "acceptanceCriteria": [
+        "Cliente HTTP configurado com base URL da lavifort-API e interceptor de Bearer token",
+        "Abstração segura de tokens com expo-secure-store",
+        "Tipagens de Task, Projeto, StatusTarefa e Prioridade alinhadas com o backend"
+      ]
+    },
+    {
+      "id": "MOB-003",
+      "title": "Módulo de Autenticação com Cache de Sessão Offline",
+      "priority": 3,
+      "status": "pending",
+      "dependsOn": ["MOB-002"],
+      "acceptanceCriteria": [
+        "Tela de login consumindo /auth/login e persistindo token",
+        "Permite acesso às telas principais em modo offline com sessão salva anteriormente",
+        "Suporte a logout seguro com limpeza de credenciais"
+      ]
+    },
+    {
+      "id": "MOB-004",
+      "title": "Banco de Dados Local e Fila Outbox para Mutações",
+      "priority": 4,
+      "status": "pending",
+      "dependsOn": ["MOB-002"],
+      "acceptanceCriteria": [
+        "Repositório local para armazenamento de tarefas e projetos",
+        "Estrutura da fila OutboxQueue para registrar mutações (CREATE, UPDATE, UPDATE_STATUS, DELETE)",
+        "Persistência não-volátil entre reinicializações do app"
+      ]
+    },
+    {
+      "id": "MOB-005",
+      "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão",
+      "priority": 5,
+      "status": "pending",
+      "dependsOn": ["MOB-004"],
+      "acceptanceCriteria": [
+        "NetInfo detecta transições entre offline e online",
+        "Sync Engine processa mutações da Outbox em ordem cronológica (FIFO)",
+        "Atualizações otimistas na UI sem bloquear a experiência do usuário",
+        "Tratamento de erros de rede e retentativas automáticas"
+      ]
+    },
+    {
+      "id": "MOB-006",
+      "title": "Componentes Base do Design System e Banner de Offline",
+      "priority": 6,
+      "status": "pending",
+      "dependsOn": ["MOB-001"],
+      "acceptanceCriteria": [
+        "Componentes reutilizáveis: Button, Badge, Input, Card, Avatar, Slider",
+        "Banner de status de conexão e sincronização no topo (Offline / Sincronizando / Sincronizado)",
+        "Alvos de toque mínimos de 44x44 dp para uso facilitado em campo"
+      ]
+    },
+    {
+      "id": "MOB-007",
+      "title": "Seletor de Projetos/Setores e Listagem de Tarefas",
+      "priority": 7,
+      "status": "pending",
+      "dependsOn": ["MOB-005", "MOB-006"],
+      "acceptanceCriteria": [
+        "Seletor de setores (Comercial, Operações, Financeiro, Desenvolvimento, etc.)",
+        "Carregamento de tarefas a partir do banco local",
+        "Sincronização em background quando online via /tasks?projetoId="
+      ]
+    },
+    {
+      "id": "MOB-008",
+      "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)",
+      "priority": 8,
+      "status": "pending",
+      "dependsOn": ["MOB-007"],
+      "acceptanceCriteria": [
+        "Visualização em colunas navegáveis (Backlog, Em Andamento, Em Revisão, Concluído)",
+        "Contadores de cards por coluna e badges de status idênticos ao larvifort-crm",
+        "Suporte a alternar entre modo Kanban e Lista Rápida"
+      ]
+    },
+    {
+      "id": "MOB-009",
+      "title": "Criação Rápida e Edição de Tarefas Offline",
+      "priority": 9,
+      "status": "pending",
+      "dependsOn": ["MOB-008"],
+      "acceptanceCriteria": [
+        "Modal/Sheet de criação rápida de tarefas com UUID v4 local",
+        "Alteração de status com 1 toque e slider de progresso (0-100%)",
+        "Edição de título, prioridade, responsável e prazo funcionando 100% offline"
+      ]
+    },
+    {
+      "id": "MOB-010",
+      "title": "Transferência de Tarefas e Subtarefas",
+      "priority": 10,
+      "status": "pending",
+      "dependsOn": ["MOB-009"],
+      "acceptanceCriteria": [
+        "Fluxo para mover tarefa para outro setor ou converter em subtarefa (/tasks/:id/transfer)",
+        "Enfileiramento na Outbox em caso de ausência de rede"
+      ]
+    },
+    {
+      "id": "MOB-011",
+      "title": "Anexos e Fotos de Evidência de Campo",
+      "priority": 11,
+      "status": "pending",
+      "dependsOn": ["MOB-009"],
+      "acceptanceCriteria": [
+        "Captura de fotos pela câmera ou galeria",
+        "Salvamento de arquivo em cache local com fila de upload quando online"
+      ]
+    },
+    {
+      "id": "MOB-012",
+      "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox",
+      "priority": 12,
+      "status": "pending",
+      "dependsOn": ["MOB-005"],
+      "acceptanceCriteria": [
+        "Tela dedicada exibindo status da rede, itens pendentes na outbox e último sync",
+        "Botão para forçar sincronização manual",
+        "Visualização de eventuais erros de conflito"
+      ]
+    },
+    {
+      "id": "MOB-013",
+      "title": "Validação de Testes e Script de Verificação (verify.sh)",
+      "priority": 13,
+      "status": "pending",
+      "dependsOn": ["MOB-001", "MOB-005", "MOB-009"],
+      "acceptanceCriteria": [
+        "Testes unitários cobrindo o Sync Engine e repositório local",
+        "scripts/verify.sh executa typecheck, lint e test com sucesso",
+        "Documentação final de progresso e decisões atualizada"
+      ]
+    }
+  ]
+}
