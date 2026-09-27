@@ -1,17 +1,23 @@
 {
   "tasks": [
-    { "id": "MOB-001", "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design", "status": "pending" },
-    { "id": "MOB-002", "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API", "status": "pending" },
-    { "id": "MOB-003", "title": "Módulo de Autenticação com Cache de Sessão Offline", "status": "pending" },
-    { "id": "MOB-004", "title": "Banco de Dados Local e Fila Outbox para Mutações", "status": "pending" },
-    { "id": "MOB-005", "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão", "status": "pending" },
-    { "id": "MOB-006", "title": "Componentes Base do Design System e Banner de Offline", "status": "pending" },
-    { "id": "MOB-007", "title": "Seletor de Projetos/Setores e Listagem de Tarefas", "status": "pending" },
-    { "id": "MOB-008", "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)", "status": "pending" },
-    { "id": "MOB-009", "title": "Criação Rápida e Edição de Tarefas Offline", "status": "pending" },
-    { "id": "MOB-010", "title": "Transferência de Tarefas e Subtarefas", "status": "pending" },
-    { "id": "MOB-011", "title": "Anexos e Fotos de Evidência de Campo", "status": "pending" },
-    { "id": "MOB-012", "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox", "status": "pending" },
-    { "id": "MOB-013", "title": "Validação de Testes e Script de Verificação (verify.sh)", "status": "pending" }
+    { "id": "MOB-001", "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design", "status": "completed" },
+    { "id": "MOB-002", "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API", "status": "completed" },
+    { "id": "MOB-003", "title": "Módulo de Autenticação com Cache de Sessão Offline", "status": "completed" },
+    { "id": "MOB-004", "title": "Banco de Dados Local e Fila Outbox para Mutações", "status": "completed" },
+    { "id": "MOB-005", "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão", "status": "completed" },
+    { "id": "MOB-006", "title": "Componentes Base do Design System e Banner de Offline", "status": "completed" },
+    { "id": "MOB-007", "title": "Seletor de Projetos/Setores e Listagem de Tarefas", "status": "completed" },
+    { "id": "MOB-008", "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)", "status": "completed" },
+    { "id": "MOB-009", "title": "Criação Rápida e Edição de Tarefas Offline", "status": "completed" },
+    { "id": "MOB-010", "title": "Transferência de Tarefas e Subtarefas", "status": "completed" },
+    { "id": "MOB-011", "title": "Anexos e Fotos de Evidência de Campo", "status": "completed" },
+    { "id": "MOB-012", "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox", "status": "completed" },
+    { "id": "MOB-013", "title": "Validação de Testes e Script de Verificação (verify.sh)", "status": "completed" },
+    { "id": "MOB-014", "title": "Módulo Pedidos (ver + crear) - services/orders.service.ts, /pedidos", "status": "completed" },
+    { "id": "MOB-015", "title": "Módulo Entregas (estado + entregar) - services/deliveries.service.ts, /entregas", "status": "completed" },
+    { "id": "MOB-016", "title": "Módulo Clientes (lista + detalle) - services/clients.service.ts, /clientes", "status": "completed" },
+    { "id": "MOB-017", "title": "Módulo Estoque (disponibilidad) - services/stock.service.ts, /estoque", "status": "completed" },
+    { "id": "MOB-018", "title": "Launcher de navegación /modules + botón Módulos en dashboard", "status": "completed" },
+    { "id": "MOB-019", "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades", "status": "pending" }
   ]
 }

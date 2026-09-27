@@ -4,7 +4,13 @@ set -euo pipefail
 
 echo "== Harness Verification =="
 
-echo "No stack-specific verifier detected."
-echo "Edit scripts/verify.sh to run this project's lint, typecheck, tests, and build."
+echo "1. Running Typecheck..."
+npm run typecheck
+
+echo "2. Running Linter..."
+npm run lint
+
+echo "3. Running Unit Tests..."
+npm test
 
 echo "VERIFICATION_PASS"

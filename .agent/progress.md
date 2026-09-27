@@ -2,28 +2,40 @@
 
 ## Current Task
 
-`MOB-001` (Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design)
+`MOB-018` (Launcher de navegación /modules + tipos de módulos) — CONCLUIDO.
+Iteración de auditoría + módulos críticos completada (MOB-014 a MOB-018).
 
 ## Status
 
-READY_FOR_EXECUTION
+MODULES_AUDIT_DONE — 18/19 módulos auditados, 5 críticos implementados.
 
-## Completed
+## Auditoría de módulos (web → mobile)
 
-- [x] Especificação de produto (`SPEC.md`) completamente detalhada com visão geral, personas, requisitos funcionais (RF-01 a RF-15), requisitos não funcionais e critérios de aceitação.
-- [x] Arquitetura de software (`ARCHITECTURE.md`) estruturada com diagramas de camadas, stack Expo + TypeScript + Zustand + SQLite/Outbox, contratos de API e design tokens.
-- [x] Regras de execução e definição de pronto (`AGENTS.md`) atualizadas com foco em Offline-First e validação de scripts.
-- [x] Registro de decisões arquiteturais (`.agent/decisions.md`) formalizado (DEC-001 a DEC-004).
-- [x] Backlog de tarefas priorizado e encadeado em `.agent/tasks.json` (`MOB-001` a `MOB-013`).
+**Ya existentes en mobile:** Quadro/Kanban (MOB-008), Tareas (CRUD/subtasks/transfer/anexos),
+Dashboard parcial (`/`), Login offline-first, Sync-status.
 
-## Current Work
+**Implementados en esta iteración (MOB-014..018):**
+- `MOB-014` Pedidos (ver+crear): `services/orders.service.ts`, `/pedidos`
+- `MOB-015` Entregas (estado+entregar): `services/deliveries.service.ts`, `/entregas`
+- `MOB-016` Clientes (lista+detalle): `services/clients.service.ts`, `/clientes`
+- `MOB-017` Estoque (disponibilidad): `services/stock.service.ts`, `/estoque`
+- `MOB-018` Launcher `/modules` + botón "Módulos" en header + tipos en `types/index.ts`
 
-- Iniciar a execução das tarefas a partir de `MOB-001` e estruturação dos módulos do projeto.
+**Pendientes (`MOB-019`):** Agenda, Empresas, Planejamento, Laboratório, Separação,
+Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades.
+
+## Diseño
+
+Tokens del mobile ya idénticos al web (brand-600 `#0284c7`, surface `#fcfcfd`,
+border `#e5e7eb`, badges de status, sin gradientes/ai-slop). Módulos nuevos siguen
+el mismo lenguaje: Card/Badge/Button, empty-states honestos, targets 44dp.
 
 ## Validation
 
-- Documentação e plano de desenvolvimento revisados e alinhados aos repositórios irmãos `larvifort-crm` e `lavifort-API`.
+- `./scripts/verify.sh` → **VERIFICATION_PASS** (typecheck strict ✓, ESLint ✓,
+  42 suites / 270 tests PASS, incl. orders 8, deliveries 4, clients 5, stock 5).
+- Rutas tipadas de expo-router regeneradas (`.expo/`, gitignored).
 
 ## Next Action
 
-Iniciar a implementação de `MOB-001` (Setup do Expo, TypeScript, roteamento e design tokens).
+Priorizar `MOB-019` (módulos restantes) o evolucionar los existentes.

@@ -24,3 +24,13 @@
 - **Data**: 2026-09-09
 - **Contexto**: Em modo offline, tarefas precisam ser criadas com identificadores únicos sem aguardar retorno do backend.
 - **Decisão**: Utilizar geração de UUID v4 no próprio cliente móvel no momento da criação da tarefa. O backend aceita ou mapeia o ID gerado na criação.
+
+## DEC-005: Armazenamento e Upload de Anexos/Fotos Offline-First
+- **Data**: 2026-09-09
+- **Contexto**: Técnicos e consultores em campo registram fotos de laudos e viveiros sem conexão com a internet.
+- **Decisão**: Salvar cópia local do arquivo via `expo-file-system` no diretório de documentos/cache do dispositivo imediatamente após a captura (`expo-image-picker`), indexar o anexo na tarefa localmente com status `PENDING` e enfileirar mutação `UPLOAD_ATTACHMENT` na `OutboxQueue`. O `Sync Engine` realiza o upload multipart/form-data assim que a conectividade for restabelecida e atualiza o status para `SYNCED`.
+
+## DEC-006: Painel de Inspeção e Controle Manual da Fila Outbox
+- **Data**: 2026-09-09
+- **Contexto**: Em operações de campo, o técnico precisa ter visibilidade total das operações pendentes na fila local, status de rede e possíveis erros de conflito com o servidor.
+- **Decisão**: Criar tela dedicada `/sync-status` conectada ao `useSyncStore` e `OutboxQueue`, permitindo visualização de métricas (total, pendentes, erros), filtragem por abas, inspeção de mensagens de erro do servidor por mutação, acionamento de sincronização manual, reprocessamento individual/global de erros e descarte de mutações.

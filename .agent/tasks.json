@@ -6,7 +6,7 @@
       "id": "MOB-001",
       "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design",
       "priority": 1,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": [],
       "acceptanceCriteria": [
         "Projeto Expo configurado com TypeScript e Expo Router",
@@ -18,7 +18,7 @@
       "id": "MOB-002",
       "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API",
       "priority": 2,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-001"],
       "acceptanceCriteria": [
         "Cliente HTTP configurado com base URL da lavifort-API e interceptor de Bearer token",
@@ -30,7 +30,7 @@
       "id": "MOB-003",
       "title": "Módulo de Autenticação com Cache de Sessão Offline",
       "priority": 3,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-002"],
       "acceptanceCriteria": [
         "Tela de login consumindo /auth/login e persistindo token",
@@ -42,7 +42,7 @@
       "id": "MOB-004",
       "title": "Banco de Dados Local e Fila Outbox para Mutações",
       "priority": 4,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-002"],
       "acceptanceCriteria": [
         "Repositório local para armazenamento de tarefas e projetos",
@@ -54,7 +54,7 @@
       "id": "MOB-005",
       "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão",
       "priority": 5,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-004"],
       "acceptanceCriteria": [
         "NetInfo detecta transições entre offline e online",
@@ -67,7 +67,7 @@
       "id": "MOB-006",
       "title": "Componentes Base do Design System e Banner de Offline",
       "priority": 6,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-001"],
       "acceptanceCriteria": [
         "Componentes reutilizáveis: Button, Badge, Input, Card, Avatar, Slider",
@@ -79,7 +79,7 @@
       "id": "MOB-007",
       "title": "Seletor de Projetos/Setores e Listagem de Tarefas",
       "priority": 7,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-005", "MOB-006"],
       "acceptanceCriteria": [
         "Seletor de setores (Comercial, Operações, Financeiro, Desenvolvimento, etc.)",
@@ -91,7 +91,7 @@
       "id": "MOB-008",
       "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)",
       "priority": 8,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-007"],
       "acceptanceCriteria": [
         "Visualização em colunas navegáveis (Backlog, Em Andamento, Em Revisão, Concluído)",
@@ -103,7 +103,7 @@
       "id": "MOB-009",
       "title": "Criação Rápida e Edição de Tarefas Offline",
       "priority": 9,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-008"],
       "acceptanceCriteria": [
         "Modal/Sheet de criação rápida de tarefas com UUID v4 local",
@@ -115,7 +115,7 @@
       "id": "MOB-010",
       "title": "Transferência de Tarefas e Subtarefas",
       "priority": 10,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-009"],
       "acceptanceCriteria": [
         "Fluxo para mover tarefa para outro setor ou converter em subtarefa (/tasks/:id/transfer)",
@@ -126,7 +126,7 @@
       "id": "MOB-011",
       "title": "Anexos e Fotos de Evidência de Campo",
       "priority": 11,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-009"],
       "acceptanceCriteria": [
         "Captura de fotos pela câmera ou galeria",
@@ -137,7 +137,7 @@
       "id": "MOB-012",
       "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox",
       "priority": 12,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-005"],
       "acceptanceCriteria": [
         "Tela dedicada exibindo status da rede, itens pendentes na outbox e último sync",
@@ -149,12 +149,82 @@
       "id": "MOB-013",
       "title": "Validação de Testes e Script de Verificação (verify.sh)",
       "priority": 13,
-      "status": "pending",
+      "status": "completed",
       "dependsOn": ["MOB-001", "MOB-005", "MOB-009"],
       "acceptanceCriteria": [
         "Testes unitários cobrindo o Sync Engine e repositório local",
         "scripts/verify.sh executa typecheck, lint e test com sucesso",
         "Documentação final de progresso e decisões atualizada"
+      ]
+    },
+    {
+      "id": "MOB-014",
+      "title": "Módulo Pedidos (ver + crear) — auditoría de paridad com web",
+      "priority": 14,
+      "status": "completed",
+      "dependsOn": ["MOB-013"],
+      "acceptanceCriteria": [
+        "services/orders.service.ts consumindo GET /orders, GET /orders/stats, POST /orders, PATCH/DELETE/PUT cancel",
+        "Pantalla /pedidos: lista, detalle com itens, criação de pedido",
+        "Tests unitários do service verdes"
+      ]
+    },
+    {
+      "id": "MOB-015",
+      "title": "Módulo Entregas (estado + entregar)",
+      "priority": 14,
+      "status": "completed",
+      "dependsOn": ["MOB-013"],
+      "acceptanceCriteria": [
+        "services/deliveries.service.ts consumindo GET /deliveries, PATCH /deliveries/:id/status, assign-driver, proof, create",
+        "Pantalla /entregas: listado, badge de estado, avanço de estado até ENTREGUE",
+        "Tests unitários do service verdes"
+      ]
+    },
+    {
+      "id": "MOB-016",
+      "title": "Módulo Clientes (lista + detalle)",
+      "priority": 14,
+      "status": "completed",
+      "dependsOn": ["MOB-013"],
+      "acceptanceCriteria": [
+        "services/clients.service.ts consumindo GET /clients, GET /clients/:id, PATCH, DELETE",
+        "Pantalla /clientes: lista con búsqueda, detalle, badges statusLead",
+        "Tests unitários do service verdes"
+      ]
+    },
+    {
+      "id": "MOB-017",
+      "title": "Módulo Estoque (disponibilidade)",
+      "priority": 14,
+      "status": "completed",
+      "dependsOn": ["MOB-013"],
+      "acceptanceCriteria": [
+        "services/stock.service.ts consumindo GET /stock/availability, POST /stock/movements",
+        "Pantalla /estoque: tarjetas disponível/reservado/bloqueado, filtro client-side",
+        "Tests unitários do service verdes"
+      ]
+    },
+    {
+      "id": "MOB-018",
+      "title": "Launcher de navegación /modules + tipos de módulos em types/index.ts",
+      "priority": 14,
+      "status": "completed",
+      "dependsOn": ["MOB-014", "MOB-015", "MOB-016", "MOB-017"],
+      "acceptanceCriteria": [
+        "Pantalla /modules con grid honesto (implementados navegam, resto 'Próximamente')",
+        "Botão 'Módulos' no header do dashboard, rutas registradas no _layout",
+        "Tipos Order/Cliente/Delivery/StockAvailability adicionados com paridade de contrato"
+      ]
+    },
+    {
+      "id": "MOB-019",
+      "title": "Módulos pendientes: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades",
+      "priority": 99,
+      "status": "pending",
+      "dependsOn": ["MOB-018"],
+      "acceptanceCriteria": [
+        "Auditados y priorizados en iteración posterior"
       ]
     }
   ]
