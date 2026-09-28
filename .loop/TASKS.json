@@ -1,25 +1,200 @@
 {
   "tasks": [
-    { "id": "MOB-001", "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design", "status": "completed" },
-    { "id": "MOB-002", "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API", "status": "completed" },
-    { "id": "MOB-003", "title": "Módulo de Autenticação com Cache de Sessão Offline", "status": "completed" },
-    { "id": "MOB-004", "title": "Banco de Dados Local e Fila Outbox para Mutações", "status": "completed" },
-    { "id": "MOB-005", "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão", "status": "completed" },
-    { "id": "MOB-006", "title": "Componentes Base do Design System e Banner de Offline", "status": "completed" },
-    { "id": "MOB-007", "title": "Seletor de Projetos/Setores e Listagem de Tarefas", "status": "completed" },
-    { "id": "MOB-008", "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)", "status": "completed" },
-    { "id": "MOB-009", "title": "Criação Rápida e Edição de Tarefas Offline", "status": "completed" },
-    { "id": "MOB-010", "title": "Transferência de Tarefas e Subtarefas", "status": "completed" },
-    { "id": "MOB-011", "title": "Anexos e Fotos de Evidência de Campo", "status": "completed" },
-    { "id": "MOB-012", "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox", "status": "completed" },
-    { "id": "MOB-013", "title": "Validação de Testes e Script de Verificação (verify.sh)", "status": "completed" },
-    { "id": "MOB-014", "title": "Módulo Pedidos (ver + crear) - services/orders.service.ts, /pedidos", "status": "completed" },
-    { "id": "MOB-015", "title": "Módulo Entregas (estado + entregar) - services/deliveries.service.ts, /entregas", "status": "completed" },
-    { "id": "MOB-016", "title": "Módulo Clientes (lista + detalle) - services/clients.service.ts, /clientes", "status": "completed" },
-    { "id": "MOB-017", "title": "Módulo Estoque (disponibilidad) - services/stock.service.ts, /estoque", "status": "completed" },
-    { "id": "MOB-018", "title": "Launcher de navegación /modules + botón Módulos en dashboard", "status": "completed" },
-    { "id": "MOB-020", "title": "ActivitiesScreen fluxo direto (Concluir/Não executada) + confirm-activity com geolocalização", "status": "completed" },
-    { "id": "MOB-019", "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades", "status": "pending" }
-    { "id": "MOB-019", "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades", "status": "pending" }
+    {
+      "id": "MOB-001",
+      "title": "Configuração inicial do Expo, TypeScript, Expo Router e Tokens de Design",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-002",
+      "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-003",
+      "title": "Módulo de Autenticação com Cache de Sessão Offline",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-004",
+      "title": "Banco de Dados Local e Fila Outbox para Mutações",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-005",
+      "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-006",
+      "title": "Componentes Base do Design System e Banner de Offline",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-007",
+      "title": "Seletor de Projetos/Setores e Listagem de Tarefas",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-008",
+      "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-009",
+      "title": "Criação Rápida e Edição de Tarefas Offline",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-010",
+      "title": "Transferência de Tarefas e Subtarefas",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-011",
+      "title": "Anexos e Fotos de Evidência de Campo",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-012",
+      "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-013",
+      "title": "Validação de Testes e Script de Verificação (verify.sh)",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-014",
+      "title": "Módulo Pedidos (ver + crear) - services/orders.service.ts, /pedidos",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-015",
+      "title": "Módulo Entregas (estado + entregar) - services/deliveries.service.ts, /entregas",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-016",
+      "title": "Módulo Clientes (lista + detalle) - services/clients.service.ts, /clientes",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-017",
+      "title": "Módulo Estoque (disponibilidad) - services/stock.service.ts, /estoque",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-018",
+      "title": "Launcher de navegación /modules + botón Módulos en dashboard",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-020",
+      "title": "ActivitiesScreen fluxo direto (Concluir/Não executada) + confirm-activity com geolocalização",
+      "status": "completed"
+    },
+    {
+      "id": "MOB-019",
+      "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades — SDD criado em docs/superpowers/specs/2026-09-28-novas-demandas-sdd.md",
+      "status": "pending"
+    },
+    {
+      "id": "MOB-020",
+      "title": "Fix parentTaskId nao sendo exibido nos badges de tarefas vinculadas",
+      "status": "pending",
+      "priority": 1,
+      "dependsOn": [],
+      "notes": "O badge de Card Pai deve mostrar o titulo e projeto do pai, nao apenas o ID."
+    },
+    {
+      "id": "MOB-021",
+      "title": "Fix Visual Workflow Canvas nao renderizando conexoes existentes ao carregar",
+      "status": "pending",
+      "priority": 1,
+      "dependsOn": [],
+      "notes": "O canvas deve carregar as arestas (conexoes) ja configuradas no backend."
+    },
+    {
+      "id": "MOB-022",
+      "title": "Implementar preview de automacao no builder mobile",
+      "status": "pending",
+      "priority": 2,
+      "dependsOn": [],
+      "notes": "Ao selecionar gatilho e acao, mostrar preview de quais cards seriam afetados."
+    },
+    {
+      "id": "MOB-023",
+      "title": "Implementar confirmacao antes de executar automacao que duplica cards cross-project",
+      "status": "pending",
+      "priority": 2,
+      "dependsOn": [],
+      "notes": "Evitar duplicacoes acidentais em producao."
+    },
+    {
+      "id": "MOB-024",
+      "title": "Fix builder de automacoes nao ativa ao mover comercial->fechado duplicar card",
+      "status": "pending",
+      "priority": 2,
+      "dependsOn": [],
+      "notes": "A acao DUPLICATE_TO_PROJECT_COLUMN deve validar targetColumnId antes de executar."
+    },
+    {
+      "id": "MOB-025",
+      "title": "Implementar indicador visual de status de sincronizacao de automacoes no canvas mobile",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Mostrar quais automacoes estao ativas, com erros ou desatualizadas."
+    },
+    {
+      "id": "MOB-026",
+      "title": "Implementar export/import de configuracoes de automacao mobile",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Permitir copiar automacoes entre projetos ou fazer backup das configuracoes."
+    },
+    {
+      "id": "MOB-027",
+      "title": "Implementar teste de automacao em modo seco (dry-run) no mobile",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Ao configurar uma automacao, permitir simular sem executar de verdade."
+    },
+    {
+      "id": "MOB-028",
+      "title": "Implementar historico de execucoes de automacao no mobile",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Lista de ultimas execucoes com status, resultado e tempo de execucao."
+    },
+    {
+      "id": "MOB-029",
+      "title": "Implementar permissoes de edicao de automacao por role no mobile",
+      "status": "pending",
+      "priority": 4,
+      "dependsOn": [],
+      "notes": "Apenas ADMIN e gestores do projeto podem criar/editar automacoes."
+    },
+    {
+      "id": "MOB-030",
+      "title": "Implementar notificacao push quando automacao falha apos todos os retries",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Integrar com sistema de notificacoes do mobile (Expo Notifications)."
+    },
+    {
+      "id": "MOB-031",
+      "title": "Implementar rate limiting visual no mobile",
+      "status": "pending",
+      "priority": 3,
+      "dependsOn": [],
+      "notes": "Mostrar limite de execucoes de automacao por projeto e alertar quando proximo do limite."
+    }
   ]
 }

@@ -1,5 +1,19 @@
 # Loop Log — LarviFort Mobile
 
+## 2026-09-28 — SDD Novas Demandas (MOB-019)
+
+**Decisão**: Iniciada criação do SDD para os 12 módulos faltantes que existem no web CRM mas não no mobile.
+
+**SDD criado**: `docs/superpowers/specs/2026-09-28-novas-demandas-sdd.md`
+- Documenta todos os 12 módulos (Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades)
+- Para cada módulo: endpoints da API, campos do domínio, telas, ações, filtros
+- Padrões de implementação alinhados com os módulos já existentes (Pedidos, Entregas, Clientes, Estoque)
+- Ordem de implementação sugerida (Fiscal/Equipe primeiro, Produtos/Unidades por último)
+- Critérios de aceitação e riscos documentados
+
+**Próximo passo**: Aguardar aprovação do TechLead para iniciar implementação do primeiro módulo.
+
+---
 ## 2026-09-27 — ActivitiesScreen (alinhamento TechLead, fluxo direto)
 
 **Decisão TechLead**: removida seleção de progresso intermediário ('Iniciar' /

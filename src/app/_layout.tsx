@@ -101,6 +101,12 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="agenda"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="(auth)/login"
         options={{
           headerShown: false,

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radii } from '@/core/theme';
-import { LayoutDashboard, Columns, Package, Truck, Users, Archive, RefreshCw, CheckSquare } from 'lucide-react-native';
+import { LayoutDashboard, Columns, Package, Truck, Users, Archive, RefreshCw, CheckSquare, Calendar } from 'lucide-react-native';
 
 export interface SidebarProps {
   visible: boolean;
@@ -13,6 +13,7 @@ const MODULES = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, route: '/modules' },
   { id: 'kanban', label: 'Quadro / Kanban', icon: Columns, route: '/' },
   { id: 'atividades', label: 'Atividades', icon: CheckSquare, route: '/atividades' },
+  { id: 'agenda', label: 'Agenda', icon: Calendar, route: '/agenda' },
   { id: 'pedidos', label: 'Pedidos', icon: Package, route: '/pedidos' },
   { id: 'entregas', label: 'Entregas', icon: Truck, route: '/entregas' },
   { id: 'clientes', label: 'Clientes', icon: Users, route: '/clientes' },

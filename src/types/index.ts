@@ -366,3 +366,48 @@ export interface StockMovementInput {
   quantity: number;
   reason: string;
 }
+
+/* =========================================================================
+ * Agenda — compromissos/agendamentos (módulo MOB-019)
+ * Paridade com lavifort-API /appointments e /compromissos.
+ * ========================================================================= */
+
+export type TipoCompromisso = 'REUNIAO' | 'VISITA';
+
+export interface Appointment {
+  id: string;
+  tipo: TipoCompromisso;
+  titulo: string;
+  data: string;
+  horario: string | null;
+  endereco: string | null;
+  observacoes: string | null;
+  clienteId: string | null;
+  clienteName: string | null;
+  empresaId: string | null;
+  ownerId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAppointmentInput {
+  tipo: TipoCompromisso;
+  titulo: string;
+  data: string;
+  horario?: string | null;
+  endereco?: string | null;
+  observacoes?: string | null;
+  clienteId: string;
+  empresaId?: string | null;
+}
+
+export interface UpdateAppointmentInput {
+  tipo?: TipoCompromisso;
+  titulo?: string;
+  data?: string;
+  horario?: string | null;
+  endereco?: string | null;
+  observacoes?: string | null;
+  clienteId?: string;
+  empresaId?: string | null;
+}
