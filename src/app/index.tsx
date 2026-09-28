@@ -8,7 +8,8 @@ import { useAuthStore } from '@/stores/auth.store';
 import { useSyncStore } from '@/stores/sync.store';
 import { useTasksStore } from '@/stores/tasks.store';
 import { localDatabase } from '@/services/sync/local-database';
-import { Avatar, OfflineBanner } from '@/components/ui';
+import { Sidebar, OfflineBanner } from '@/components/ui';
+import { Menu, RefreshCw, LogOut, LayoutGrid } from 'lucide-react-native';
 import {
   ProjectSelector,
   TaskList,
@@ -53,6 +54,7 @@ export default function IndexScreen() {
     deleteAttachment,
   } = useTasksStore();
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -154,25 +156,28 @@ export default function IndexScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      {/* Offline and Sync Status Banner */}
-      <OfflineBanner
-        isConnected={isConnected}
-        isSyncing={isSyncing}
-        pendingCount={pendingCount}
-        errorCount={errorCount}
-        onSyncPress={handleSyncPress}
-        onPressBanner={() => router.push('/sync-status')}
-      />
+      <Sidebar visible={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Top Header */}
       <View style={styles.header} testID="app-header">
         <View style={styles.headerLeft}>
+          <TouchableOpacity
+            testID="sidebar-menu-button"
+            onPress={() => setIsSidebarOpen(true)}
+            style={styles.menuButton}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir menu de navegação"
+          >
+            <Menu size={24} color={colors.neutral.textPrimary} />
+          </TouchableOpacity>
           <View style={styles.brandBadge}>
             <Text style={styles.brandBadgeText}>LF</Text>
           </View>
-          <View>
-            <Text style={styles.headerTitle}>LarviFort CRM</Text>
-            <Text style={styles.headerSubtitle}>
+          <View style={styles.headerText}>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              LarviFort CRM
+            </Text>
+            <Text style={styles.headerSubtitle} numberOfLines={1}>
               {user ? user.nome || user.email : 'Painel Operacional'}
             </Text>
           </View>
@@ -181,57 +186,44 @@ export default function IndexScreen() {
         <View style={styles.headerRight}>
           <TouchableOpacity
             testID="modules-header-button"
+            onPress={() => router.push('/modules' as any)}
+            style={styles.headerActionButton}
             accessibilityRole="button"
-            accessibilityLabel="Abrir módulos"
-            style={styles.modulesIconButton}
-            onPress={() => router.push('/modules')}
-            activeOpacity={0.7}
+            accessibilityLabel="Acessar módulos"
           >
-            <Text style={styles.modulesIconText}>Módulos</Text>
+            <LayoutGrid size={18} color={colors.neutral.textSecondary} />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="sync-status-header-button"
+            onPress={handleSyncPress}
+            style={styles.headerActionButton}
+            accessibilityRole="button"
+            accessibilityLabel="Sincronizar tarefas"
+          >
+            <RefreshCw size={18} color={isSyncing ? colors.brand[600] : colors.neutral.textSecondary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="logout-header-button"
+            onPress={handleLogout}
+            style={styles.headerActionButton}
+            accessibilityRole="button"
+            accessibilityLabel="Sair do aplicativo"
+          >
+            <LogOut size={18} color={colors.sync.error} />
+          </TouchableOpacity>
+
           <ViewModeToggle
             mode={viewMode}
             onChangeMode={setViewMode}
             testID="view-mode-toggle"
           />
-          <TouchableOpacity
-            testID="sync-status-header-button"
-            accessibilityRole="button"
-            accessibilityLabel="Ver status de sincronização"
-            style={styles.syncIconButton}
-            onPress={() => router.push('/sync-status')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.syncIconText}>Sync</Text>
-            {(pendingCount > 0 || errorCount > 0) && (
-              <View
-                style={[
-                  styles.syncBadgeDot,
-                  errorCount > 0 ? styles.syncBadgeDotError : styles.syncBadgeDotPending,
-                ]}
-                testID="sync-status-dot"
-              />
-            )}
-          </TouchableOpacity>
-          {user && (
-            <Avatar
-              name={user.nome || user.email}
-              size="sm"
-              style={styles.headerAvatar}
-            />
-          )}
-          <TouchableOpacity
-            testID="logout-header-button"
-            accessibilityRole="button"
-            accessibilityLabel="Encerrar sessão"
-            style={styles.logoutIconButton}
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.logoutIconText}>Sair</Text>
-          </TouchableOpacity>
         </View>
       </View>
+
+      {/* Offline Synchronization Banner */}
+      <OfflineBanner testID="offline-banner" />
 
       {/* Project / Sector Selector */}
       <View style={styles.selectorWrapper}>
@@ -256,6 +248,7 @@ export default function IndexScreen() {
             onSearchChange={setSearchQuery}
             testID="kanban-board"
           />
+
         ) : (
           <TaskList
             tasks={filteredTasks}
@@ -334,10 +327,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.neutral.border,
   },
+  menuButton: { marginRight: spacing.sm, padding: spacing.xs },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    flexShrink: 1,
+    marginRight: spacing.sm,
+  },
+  headerText: {
+    flexShrink: 1,
   },
   brandBadge: {
     width: 36,
@@ -366,15 +365,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
   },
+  headerActionButton: {
+    minHeight: minTouchTarget,
+    minWidth: minTouchTarget,
+    padding: spacing.xs,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: radii.sm,
+  },
   headerAvatar: {
     marginLeft: 2,
     marginRight: 2,
   },
   syncIconButton: {
     position: 'relative',
-    minHeight: 32,
+    minHeight: minTouchTarget,
+    minWidth: minTouchTarget,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
     borderRadius: radii.sm,
     backgroundColor: colors.brand[50],
     borderWidth: 1,
@@ -405,9 +412,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc2626',
   },
   modulesIconButton: {
-    minHeight: 32,
+    minHeight: minTouchTarget,
+    minWidth: minTouchTarget,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
     borderRadius: radii.sm,
     backgroundColor: colors.brand[50],
     borderWidth: 1,
@@ -422,9 +429,9 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeights.bold,
   },
   logoutIconButton: {
-    minHeight: 32,
+    minHeight: minTouchTarget,
+    minWidth: minTouchTarget,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
     borderRadius: radii.sm,
     backgroundColor: colors.neutral.surfaceSubtle,
     borderWidth: 1,
@@ -442,6 +449,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.neutral.border,
     paddingVertical: 4,
+  },
+  toolbar: {
+    backgroundColor: colors.neutral.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    alignItems: 'flex-start',
   },
   listWrapper: {
     flex: 1,

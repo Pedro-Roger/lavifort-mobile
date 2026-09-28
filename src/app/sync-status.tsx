@@ -252,6 +252,9 @@ export default function SyncStatusScreen() {
           <View style={styles.filterTabs}>
             <TouchableOpacity
               testID="filter-all"
+              accessibilityRole="tab"
+              accessibilityLabel="Filtro: Todas"
+              accessibilityState={{ selected: activeFilter === 'ALL' }}
               style={[styles.filterTab, activeFilter === 'ALL' && styles.filterTabActive]}
               onPress={() => setActiveFilter('ALL')}
               activeOpacity={0.7}
@@ -268,6 +271,9 @@ export default function SyncStatusScreen() {
 
             <TouchableOpacity
               testID="filter-pending"
+              accessibilityRole="tab"
+              accessibilityLabel="Filtro: Pendentes"
+              accessibilityState={{ selected: activeFilter === 'PENDING' }}
               style={[styles.filterTab, activeFilter === 'PENDING' && styles.filterTabActive]}
               onPress={() => setActiveFilter('PENDING')}
               activeOpacity={0.7}
@@ -284,6 +290,9 @@ export default function SyncStatusScreen() {
 
             <TouchableOpacity
               testID="filter-error"
+              accessibilityRole="tab"
+              accessibilityLabel="Filtro: Erros"
+              accessibilityState={{ selected: activeFilter === 'ERROR' }}
               style={[styles.filterTab, activeFilter === 'ERROR' && styles.filterTabActive]}
               onPress={() => setActiveFilter('ERROR')}
               activeOpacity={0.7}
@@ -472,8 +481,9 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   filterTab: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
+    minHeight: minTouchTarget,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
     borderRadius: radii.xs,
   },
   filterTabActive: {

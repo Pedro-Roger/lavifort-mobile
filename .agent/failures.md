@@ -29,3 +29,15 @@ Record recurring failures, root causes, and resolutions.
 - **Causa raíz**: se usó `// eslint-disable-next-line react-hooks/exhaustive-deps` pero la
   config (`.eslintrc.js`) no carga el plugin `react-hooks`.
 - **Resolución**: eliminar el comentario de disable (la regla no está activa).
+
+## 2026-09-27 — verify bloqueado por arquivo alheio com erro de sintaxe
+- **Sintoma**: `tsc` (3 erros) + `index.test.tsx` (SyntaxError) falhando por
+  `src/components/ui/Sidebar.tsx:91` — `paddingTop: spacing.2xl` (sintaxe inválida;
+  correto seria `spacing['2xl']`). Arquivo untracked de outro agente (criado 19:03),
+  puxado via `export * from './Sidebar'` no barrel `ui/index.ts`.
+- **Causa raiz**: edições paralelas no mesmo diretório sem coordenação de arquivos.
+- **Resolução**: NÃO editar arquivo alheio ativo; reportar ao TechLead e aguardar
+  (trabalho live → espero; órfão → dono corrige). Evidência isolada: todo o resto
+  (tsc sem esse arquivo, eslint, 270/270 testes) verde.
+- **Lição**: antes de `verify.sh`, rodar `git status` e checar se há arquivos
+  untracked/modificados de outros agentes quebrando a árvore.

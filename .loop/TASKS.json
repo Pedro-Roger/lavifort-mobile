@@ -18,6 +18,8 @@
     { "id": "MOB-016", "title": "Módulo Clientes (lista + detalle) - services/clients.service.ts, /clientes", "status": "completed" },
     { "id": "MOB-017", "title": "Módulo Estoque (disponibilidad) - services/stock.service.ts, /estoque", "status": "completed" },
     { "id": "MOB-018", "title": "Launcher de navegación /modules + botón Módulos en dashboard", "status": "completed" },
+    { "id": "MOB-020", "title": "ActivitiesScreen fluxo direto (Concluir/Não executada) + confirm-activity com geolocalização", "status": "completed" },
+    { "id": "MOB-019", "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades", "status": "pending" }
     { "id": "MOB-019", "title": "FALTANTES: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades", "status": "pending" }
   ]
 }

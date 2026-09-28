@@ -1,0 +1,28 @@
+MOBILE APP E2E - QA REPORT
+
+1) Login (Offline-First): PASS 🟩
+- Credenciales: eng.pedrodev@gmail.com validado vs api.larvifort.online.
+- API Load: 200 OK, entró a Kanban por defecto.
+
+2) Modulos (Module Launcher): PASS 🟩
+- /modules cargó el grid de módulos idéntico al web (brand600, surface).
+
+3) Pedidos (/pedidos): PASS 🟩
+- Carga de API: Sí. Estado vacío honesto ("No hay pedidos") sin mock data. Status 200.
+
+4) Clientes (/clientes): PASS 🟩
+- Carga de API: Sí. Estado vacío honesto ("No hay clientes"). Status 200.
+
+5) Entregas (/entregas): PASS 🟩 / WARN 🟨
+- Carga de API: Sí. Tablist renderizado (Todas, Aguardando, Em Rota, Entregue).
+- Data vacía por falta de pedidos. Status 200.
+- ERROR VISUAL: React Warning overlay "! Each child in a list should have a unique 'key' prop."
+
+6) Estoque (/estoque): PASS 🟩 / WARN 🟨
+- Carga de API: Sí. Availability REAL mostrada (Itarema, Morada Nova, Berçários con 500000). Status 200.
+- ERROR VISUAL: Mismo React Warning overlay sobre "key" prop (VirtualizedList).
+
+7) Kanban/Quadro: PASS 🟩
+- Carga de API: Sí. Columnas renderizan (Backlog, Em Andamento). Status 200.
+
+VEREDICTO: La arquitectura de UI, ruteo y fetch de API REAL (api.larvifort.online) están operativos sin CRASHES FATALES. Fixear los warnings del prop "key" en VirtualizedList (Estoque y Entregas).

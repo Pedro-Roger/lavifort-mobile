@@ -171,6 +171,7 @@ export default function EstoqueScreen() {
       <FlatList
         data={filteredItems}
         keyExtractor={(item) => item.id}
+        style={styles.list}
         renderItem={renderItem}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.listContent}
@@ -194,6 +195,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.neutral.background,
     padding: spacing.lg,
+  },
+  list: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -241,7 +245,7 @@ const styles = StyleSheet.create({
   stateHint: {
     fontSize: typography.fontSizes.sm,
     lineHeight: typography.lineHeights.sm,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },

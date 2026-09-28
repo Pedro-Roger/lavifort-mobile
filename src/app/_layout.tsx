@@ -95,6 +95,12 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="atividades"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="(auth)/login"
         options={{
           headerShown: false,

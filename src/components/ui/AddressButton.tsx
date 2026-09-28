@@ -176,9 +176,9 @@ const styles = StyleSheet.create({
     borderColor: colors.neutral.border,
     borderWidth: 1,
     borderRadius: radii.sm,
-    paddingVertical: 4,
-    paddingHorizontal: spacing.xs,
-    minHeight: 28,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    minHeight: minTouchTarget,
   },
   compactAddressText: {
     flex: 1,

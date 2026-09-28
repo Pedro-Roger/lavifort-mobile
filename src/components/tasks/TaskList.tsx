@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   filterChip: {
-    minHeight: 34,
+    minHeight: minTouchTarget,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: radii.full,

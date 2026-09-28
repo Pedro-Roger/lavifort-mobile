@@ -1,0 +1,10 @@
+MOBILE APP E2E - RE-VERIFICACION KEY WARNING
+
+1) Entregas (/entregas): PASS 🟩
+- Warning de "Each child unique key prop" AUSENTE. Tablist limpio.
+
+2) Estoque (/estoque): PASS 🟩
+- Warning de "Each child unique key prop" AUSENTE. VirtualizedList limpia cargando +12 berçários.
+
+VEREDICTO: Limpio sin warnings en UI. El fix de keys (renderItem / keyExtractor) funcionó perfectamente.
+APROBADO. Proceder con el commit mobile.

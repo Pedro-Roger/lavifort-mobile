@@ -1,13 +1,13 @@
 import React from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   StyleProp,
   ViewStyle,
 } from 'react-native';
 import { colors, spacing, radii, typography, minTouchTarget } from '@/core/theme';
+import { Columns, List } from 'lucide-react-native';
 
 export type ViewMode = 'kanban' | 'list';
 
@@ -41,15 +41,7 @@ export function ViewModeToggle({
         onPress={() => onChangeMode('kanban')}
         activeOpacity={0.7}
       >
-        <Text style={[styles.buttonIcon, isKanban && styles.activeText]}>📊</Text>
-        <Text
-          style={[
-            styles.buttonText,
-            isKanban ? styles.activeButtonText : styles.inactiveButtonText,
-          ]}
-        >
-          Kanban
-        </Text>
+        <Columns size={16} color={isKanban ? colors.brand[700] : colors.neutral.textSecondary} />
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -64,15 +56,7 @@ export function ViewModeToggle({
         onPress={() => onChangeMode('list')}
         activeOpacity={0.7}
       >
-        <Text style={[styles.buttonIcon, isList && styles.activeText]}>📋</Text>
-        <Text
-          style={[
-            styles.buttonText,
-            isList ? styles.activeButtonText : styles.inactiveButtonText,
-          ]}
-        >
-          Lista
-        </Text>
+        <List size={16} color={isList ? colors.brand[700] : colors.neutral.textSecondary} />
       </TouchableOpacity>
     </View>
   );
@@ -87,7 +71,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.neutral.border,
     padding: 2,
-    minHeight: 36,
+    minHeight: minTouchTarget,
   },
   button: {
     flexDirection: 'row',
@@ -96,8 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 6,
     borderRadius: radii.sm,
-    minHeight: 32,
-    gap: 4,
+    minHeight: minTouchTarget - 4,
   },
   activeButton: {
     backgroundColor: colors.neutral.surface,
@@ -109,22 +92,5 @@ const styles = StyleSheet.create({
   },
   inactiveButton: {
     backgroundColor: 'transparent',
-  },
-  buttonIcon: {
-    fontSize: 12,
-  },
-  activeText: {
-    opacity: 1,
-  },
-  buttonText: {
-    fontSize: typography.fontSizes.xs,
-    fontWeight: typography.fontWeights.medium,
-  },
-  activeButtonText: {
-    color: colors.brand[700],
-    fontWeight: typography.fontWeights.semibold,
-  },
-  inactiveButtonText: {
-    color: colors.neutral.textSecondary,
   },
 });

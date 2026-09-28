@@ -47,6 +47,10 @@ export interface Task {
   orderId?: string | null;
   orderNumber?: string | null;
   orderTotal?: number | null;
+  /** Tipo da tarefa no backend (GERAL, COMPROMISSO, PEDIDO, ORCAMENTO). */
+  tipo?: TipoTask | string | null;
+  /** Confirmação de execução (check-in) — presente quando concluída. */
+  confirmation?: TaskActivityConfirmation | null;
   parentId?: string | null;
   ordem?: number;
   subtarefas?: SubTask[];
@@ -166,6 +170,31 @@ export interface SyncStatusInfo {
   pendingCount: number;
   errorCount: number;
   lastSyncedAt: string | null;
+}
+
+/* =========================================================================
+ * Atividades de campo — paridade com lavifort-API (tasks/COMPROMISSO)
+ * POST /tasks/:id/confirm-activity exige { latitude, longitude, accuracyMeters }.
+ * "Não executada" é estado de filtro (sem endpoint de mutação no backend).
+ * ========================================================================= */
+
+export type TipoTask = 'GERAL' | 'COMPROMISSO' | 'PEDIDO' | 'ORCAMENTO';
+
+export interface TaskActivityConfirmation {
+  id: string;
+  taskId: string;
+  confirmedById: string;
+  confirmedAt: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  createdAt: string;
+}
+
+export interface ConfirmActivityInput {
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
 }
 
 /* =========================================================================

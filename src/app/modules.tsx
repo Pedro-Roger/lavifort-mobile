@@ -20,6 +20,7 @@ export default function ModulesScreen() {
     { route: '/entregas', label: 'Entregas', shortLabel: 'EN', description: 'Estado y confirmación de entregas' },
     { route: '/clientes', label: 'Clientes', shortLabel: 'CL', description: 'Lista y detalle de clientes' },
     { route: '/estoque', label: 'Estoque', shortLabel: 'ES', description: 'Disponibilidad de productos' },
+    { route: '/atividades', label: 'Atividades', shortLabel: 'AT', description: 'Concluir atividades de campo' },
     { route: '/sync-status', label: 'Sincronización', shortLabel: 'SY', description: 'Estado de red y fila Outbox' },
     { route: null, label: 'Agenda', shortLabel: 'AG', description: 'Visitas y reuniones' },
     { route: null, label: 'Empresas', shortLabel: 'EM', description: 'Empresas y entidades' },

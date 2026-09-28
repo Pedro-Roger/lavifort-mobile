@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   StyleSheet,
   StyleProp,
   ViewStyle,
-  Dimensions,
 } from 'react-native';
 import { colors, spacing, radii, typography, minTouchTarget } from '@/core/theme';
 import { Task, StatusTarefa } from '@/types';

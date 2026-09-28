@@ -34,3 +34,9 @@
 - **Data**: 2026-09-09
 - **Contexto**: Em operações de campo, o técnico precisa ter visibilidade total das operações pendentes na fila local, status de rede e possíveis erros de conflito com o servidor.
 - **Decisão**: Criar tela dedicada `/sync-status` conectada ao `useSyncStore` e `OutboxQueue`, permitindo visualização de métricas (total, pendentes, erros), filtragem por abas, inspeção de mensagens de erro do servidor por mutação, acionamento de sincronização manual, reprocessamento individual/global de erros e descarte de mutações.
+
+## DEC-007: ActivitiesScreen com fluxo direto (alinhamento TechLead 2026-09-27)
+- **Data**: 2026-09-27
+- **Contexto**: O operador de campo precisa confirmar execução de atividades (tasks tipo COMPROMISSO) com o menor atrito possível. Seleção de progresso intermediário ('Iniciar' / 'Em andamento') adicionava toques sem valor operacional.
+- **Decisão**: Tela `/atividades` com fluxo direto — estados terminais Concluir / Não executada, sem UI intermediária; filtros simplificados (Todas / Não executadas / Concluídas). "Não executada" é estado de filtro (o backend não expõe mutação correspondente; só `POST /tasks/:id/confirm-activity`). Concluir = check-in com geolocalização (`expo-location`, exigido pelo contrato: latitude/longitude/accuracyMeters obrigatórios; permissão iOS `NSLocationWhenInUseUsageDescription`).
+- **Consequências**: Dependência `expo-location@~18.0.10` adicionada (motivo claro: contrato do backend); `Task` estendido com `tipo?`/`confirmation?` opcionais; Kanban de 4 status e TaskDetailModal NÃO alterados (fluxo de tarefas gerais preservado).

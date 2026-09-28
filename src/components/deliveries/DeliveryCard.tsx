@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: typography.fontSizes.sm,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
   },
   infoValue: {
     flex: 1,

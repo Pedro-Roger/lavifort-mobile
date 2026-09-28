@@ -85,6 +85,7 @@ export function KanbanColumn({
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
+        style={styles.listFlex}
         renderItem={renderItem}
         ListEmptyComponent={renderEmptyComponent}
         contentContainerStyle={styles.listContent}
@@ -150,6 +151,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['3xl'],
     flexGrow: 1,
   },
+  listFlex: {
+    flex: 1,
+  },
   emptyContainer: {
     paddingVertical: spacing['3xl'],
     paddingHorizontal: spacing.lg,
@@ -172,7 +176,7 @@ const styles = StyleSheet.create({
   },
   emptyMessage: {
     fontSize: typography.fontSizes.xs,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
     textAlign: 'center',
   },
 });

@@ -6,3 +6,4 @@ export * from './Avatar';
 export * from './Slider';
 export * from './OfflineBanner';
 export * from './AddressButton';
+export * from './Sidebar';

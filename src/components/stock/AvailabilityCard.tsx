@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   location: {
     marginTop: spacing.xs,
     fontSize: typography.fontSizes.xs,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -113,6 +113,6 @@ const styles = StyleSheet.create({
   metricSideLabel: {
     marginTop: spacing.xxs,
     fontSize: typography.fontSizes.xs,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
   },
 });

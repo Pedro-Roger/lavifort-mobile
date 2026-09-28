@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { colors, spacing, typography, radii } from '@/core/theme';
+import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
 import { DeliveryStatus, DELIVERY_STATUS_FLOW } from '@/services/deliveries.service';
 
 export interface StatusPillOption {
@@ -55,7 +55,8 @@ export function DeliveryStatusFilter({
           <TouchableOpacity
             key={option.key}
             testID={`delivery-pill-${option.key}`}
-            accessibilityRole="button"
+            accessibilityRole="radio"
+            accessibilityLabel={option.label}
             accessibilityState={{ selected: isActive }}
             style={[styles.pill, isActive && styles.pillActive]}
             onPress={() => onChange(option.key)}
@@ -78,9 +79,9 @@ const styles = StyleSheet.create({
     paddingRight: spacing.lg,
   },
   pill: {
-    minHeight: 36,
-    paddingHorizontal: spacing.md,
+    minHeight: minTouchTarget,
     justifyContent: 'center',
+    paddingHorizontal: spacing.md,
     borderRadius: radii.full,
     backgroundColor: colors.neutral.surface,
     borderWidth: 1,

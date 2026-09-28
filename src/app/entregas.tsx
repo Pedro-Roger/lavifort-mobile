@@ -130,6 +130,7 @@ export default function EntregasScreen() {
         <FlatList
           data={filteredDeliveries}
           keyExtractor={(item) => item.id}
+          style={styles.list}
           renderItem={({ item }) => (
             <DeliveryCard
               key={`delivery-${item.id}`}
@@ -161,6 +162,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.neutral.background,
     padding: spacing.lg,
+  },
+  list: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
   emptyHint: {
     fontSize: typography.fontSizes.sm,
     lineHeight: typography.lineHeights.base,
-    color: colors.neutral.textMuted,
+    color: colors.neutral.textSecondary,
     textAlign: 'center',
   },
   retryButton: {

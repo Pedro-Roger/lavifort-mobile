@@ -71,13 +71,14 @@ export function ProjectSelector({
         {projects.map((project) => {
           const isSelected = selectedProjectId === project.id;
           const projectColor = project.cor || colors.brand[600];
+          const projectName = project.nome || (project as any).name || 'Sem Nome';
 
           return (
             <TouchableOpacity
               key={project.id}
               testID={`project-chip-${project.id}`}
               accessibilityRole="button"
-              accessibilityLabel={`Setor ${project.nome}`}
+              accessibilityLabel={`Setor ${projectName}`}
               accessibilityState={{ selected: isSelected }}
               style={[
                 styles.chip,
@@ -94,7 +95,7 @@ export function ProjectSelector({
                 ]}
                 numberOfLines={1}
               >
-                {project.nome}
+                {projectName}
               </Text>
               {typeof project.tarefasCount === 'number' && project.tarefasCount > 0 && (
                 <View
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: minTouchTarget,
     paddingHorizontal: spacing.md,
-    borderRadius: radii.full,
+    borderRadius: radii.md,
     borderWidth: 1,
   },
   inactiveChip: {
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   dot: {
     width: 8,
     height: 8,
-    borderRadius: radii.full,
+    borderRadius: radii.sm,
     marginRight: spacing.xs,
   },
   chipText: {
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.xs,
     paddingHorizontal: 6,
     paddingVertical: 1,
-    borderRadius: radii.full,
+    borderRadius: radii.md,
   },
   inactiveCountBadge: {
     backgroundColor: colors.neutral.surfaceSubtle,

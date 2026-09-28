@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.larvifort.mobile"
+      "bundleIdentifier": "com.larvifort.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Sua localização é usada para confirmar a execução de atividades em campo (check-in com horário e coordenadas)."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,6 +39,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "56b49cc8-49aa-49c0-8ca5-0178e764858c"
+      }
     }
   }
 }
