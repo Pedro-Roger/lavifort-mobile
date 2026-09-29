@@ -23,6 +23,8 @@ export default function ModulesScreen() {
     { route: '/atividades', label: 'Atividades', shortLabel: 'AT', description: 'Concluir atividades de campo' },
     { route: '/sync-status', label: 'Sincronización', shortLabel: 'SY', description: 'Estado de red y fila Outbox' },
     { route: '/agenda', label: 'Agenda', shortLabel: 'AG', description: 'Visitas y reuniones' },
+    { route: '/carteira', label: 'Carteira', shortLabel: 'CA', description: 'Clientes por región de la vendedora' },
+    { route: '/checkin', label: 'Check-in GPS', shortLabel: 'CK', description: 'Marcar presencia en las fincas' },
     { route: null, label: 'Empresas', shortLabel: 'EM', description: 'Empresas y entidades' },
     { route: null, label: 'Laboratório', shortLabel: 'LB', description: 'Análisis y ensayos' },
     { route: null, label: 'Separação', shortLabel: 'SP', description: 'Armado y picking' },

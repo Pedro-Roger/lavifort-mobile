@@ -25,6 +25,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0284c7"
       },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "package": "com.larvifort.mobile"
     },
     "web": {

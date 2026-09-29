@@ -101,6 +101,18 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="carteira"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="checkin"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="agenda"
         options={{
           headerShown: false,

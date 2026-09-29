@@ -2,32 +2,36 @@
 
 ## Current Task
 
-`MOB-020` (ActivitiesScreen) — CONCLUÍDO E HOMOLOGADO. `verify.sh` VERIFICATION_PASS
-(43 suites / 274 testes). TechLead integrou header (OfflineBanner + colors.sync.error).
+`MOB-020` (Task 1.2) — Carteira por região da vendedora + Check-in GPS + CRM
+offline/simplificado. **Rodada corretiva pós-QA aplicada e VERDE.**
+`./scripts/verify.sh` → **VERIFICATION_PASS** (47 suites / 315 testes).
 
 ## Status
 
-ACTIVITIES_CODE_DONE_VERIFY_BLOCKED_FOREIGN_FILE.
+TASK_1_2_CORRECTIVE_DONE.
 
-## Última iteración — ActivitiesScreen (alinhamento TechLead)
+## Rodada corretiva (QA) — contrato real + limpeza
 
-- Criada `/atividades`: lista de COMPROMISSO (filtro client-side; GET /tasks não
-  aceita `?tipo`), filtros Todas / Não executadas / Concluídas, ação "Concluir"
-  com geolocalização (`expo-location`), sem UI intermediária. DEC-007 registrada.
-- `activities.service.ts` + teste 4/4 PASS; tipos com paridade (`tipo?`,
-  `confirmation?`); rota + launcher; `NSLocationWhenInUseUsageDescription`.
-- Evidência: eslint 0 erros (meus arquivos); tsc limpo exceto `Sidebar.tsx`;
-  jest 270/270 PASS; `index.test.tsx` falha SÓ pelo SyntaxError alheio.
-- **Bloqueio**: `src/components/ui/Sidebar.tsx:91` (`spacing.2xl` inválido) —
-  arquivo de outro agente (19:03, untracked). NÃO tocado. Aguardando TechLead.
+- **Geofence real**: `Region` mobile agora `centerLat/centerLng/radiusKm: number | null`
+  (paridade com o backend). `verifyRegion` em `services/checkin.service.ts` valida por
+  raio em km quando há coordenadas; `null` → fallback (uf/cidade na carteira).
+- **Status do cliente**: `Cliente` ganhou `status?: 'ativo'|'inativo'` e `regiaoId?`.
+  `regions.service.ts`: `isActiveClient` + `filterCarteira` (só ativos da região);
+  `clientBelongsToRegion` prioriza `regiaoId`. `/carteira` e `/checkin` usam `filterCarteira`.
+- **Arquivos soltos (outro agente) ELIMINADOS**: `src/app/cadastro-cliente.tsx` +
+  `src/hooks/useCadastroCliente.ts` (protótipo: regiões hardcoded, GPS mockado, campos
+  fora do contrato, sem rota). Não existe `cadastro-cliente.service.ts`.
 
 ## Validation
 
-- Unit/lint dos meus arquivos: VERDE. `verify.sh` completo: VERMELHO por arquivo alheio.
+- `./scripts/verify.sh` → **VERIFICATION_PASS** (typecheck ✓, ESLint ✓,
+  47 suites / 315 testes PASS, incl. regions 16 + checkin 9 novos).
 
 ## Next Action
 
-TechLead decide: Sidebar live (espero) ou órfão (quem corrige) → re-run verify → commit.
+TechLead homologa a rodada corretiva. Backlog `MOB-019` segue pendente.
+
+---
 
 ## Última iteración — Repaginada visual
 

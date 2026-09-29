@@ -295,6 +295,8 @@ export const CLIENT_STATUSES = [
 ] as const;
 export type ClienteStatus = (typeof CLIENT_STATUSES)[number];
 
+export type ClienteOperationalStatus = 'ativo' | 'inativo';
+
 export interface Cliente {
   id: string;
   firstName: string;
@@ -304,6 +306,10 @@ export interface Cliente {
   birthdate: string | null;
   cpfCnpj: string | null;
   statusLead: ClienteStatus;
+  /** Status operacional real do cliente no backend ("ativo" | "inativo"). */
+  status?: ClienteOperationalStatus;
+  /** Região de atuação real (Task 1.2). Filtro preferencial da carteira. */
+  regiaoId?: string | null;
   origem: string | null;
   pais: string | null;
   cidade: string | null;
@@ -410,4 +416,55 @@ export interface UpdateAppointmentInput {
   observacoes?: string | null;
   clienteId?: string;
   empresaId?: string | null;
+}
+
+/* =========================================================================
+ * Regiões & Carteira — Task 1.2 (CRM de campo da vendedora)
+ * Paridade com lavifort-API GET /regions (fallback offline p/ lista default).
+ * A verificação por região usa geofence (centro + raio) e/ou uf/cidade.
+ * ========================================================================= */
+
+export interface Region {
+  id: string;
+  nome: string;
+  /** UFs que pertencem à região (ex.: ['CE']). */
+  ufs: string[];
+  /** Cidades da região (ex.: ['Fortaleza', 'Aracati']). */
+  cidades: string[];
+  /** Centro do geofence (verificação por GPS). Opcionais — null = sem geofence. */
+  centerLat: number | null;
+  centerLng: number | null;
+  /** Raio de tolerância em km para considerar o ponto dentro da região. */
+  radiusKm: number | null;
+  /** Opcional: id da região atribuída à vendedora no backend. */
+  salesRepRegionId?: string;
+  /** Paridade com o backend: descrição e vendedora dona da região. */
+  descricao?: string | null;
+  vendedoraId?: string | null;
+  ativa?: boolean;
+}
+
+export interface CheckinInput {
+  clientId: string;
+  clientName: string;
+  regionId: string;
+  regionName: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  /** Quando a visita está vinculada a um compromisso (sync p/ /appointments/:id/checkin). */
+  appointmentId?: string | null;
+}
+
+export type CheckinSyncStatus = 'PENDING' | 'SYNCED' | 'LOCAL';
+
+export interface CheckinRecord extends CheckinInput {
+  id: string;
+  checkedInAt: string;
+  syncStatus: CheckinSyncStatus;
+}
+
+export interface RegionVerification {
+  inside: boolean;
+  distanceKm: number;
 }

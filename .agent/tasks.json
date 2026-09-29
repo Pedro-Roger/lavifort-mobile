@@ -226,6 +226,22 @@
       "acceptanceCriteria": [
         "Auditados y priorizados en iteración posterior"
       ]
+    },
+    {
+      "id": "MOB-020",
+      "title": "Task 1.2 — Carteira por região da vendedora + Check-in GPS + CRM offline/simplificado",
+      "priority": 2,
+      "status": "completed",
+      "dependsOn": ["MOB-013", "MOB-016"],
+      "acceptanceCriteria": [
+        "Login JWT com guard de rota e persistência de token (já existente, validado)",
+        "services/regions.service.ts consumindo GET /regions (centerLat/centerLng/radiusKm opcionais) com fallback offline p/ DEFAULT_REGIONS",
+        "Tela /carteira: clientes ATIVOS da região da vendedora (client.regiaoId preferencial; fallback uf/cidade; status != inativo)",
+        "services/checkin.service.ts: geofence REAL por raio (km) quando a região traz coordenadas; fallback uf/cidade quando null; persistência local offline-first; sync PATCH /appointments/:id/checkin",
+        "Tela /checkin: marcacao nas fazendas com verificacao por regiao (expo-location)",
+        "Arquivos soltos de outro agente (cadastro-cliente.tsx, useCadastroCliente.ts) removidos (protótipo não desplegável)",
+        "Testes unitarios de regions/checkin verdes; verify.sh passa"
+      ]
     }
   ]
 }

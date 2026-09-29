@@ -16,4 +16,5 @@ export const STORAGE_KEYS = {
   LOCAL_TASKS: 'larvifort_local_tasks',
   LOCAL_PROJECTS: 'larvifort_local_projects',
   LAST_SYNC: 'larvifort_last_sync',
+  CHECKINS: 'larvifort_checkins',
 } as const;

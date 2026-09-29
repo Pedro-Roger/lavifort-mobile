@@ -40,3 +40,22 @@
 - **Contexto**: O operador de campo precisa confirmar execução de atividades (tasks tipo COMPROMISSO) com o menor atrito possível. Seleção de progresso intermediário ('Iniciar' / 'Em andamento') adicionava toques sem valor operacional.
 - **Decisão**: Tela `/atividades` com fluxo direto — estados terminais Concluir / Não executada, sem UI intermediária; filtros simplificados (Todas / Não executadas / Concluídas). "Não executada" é estado de filtro (o backend não expõe mutação correspondente; só `POST /tasks/:id/confirm-activity`). Concluir = check-in com geolocalização (`expo-location`, exigido pelo contrato: latitude/longitude/accuracyMeters obrigatórios; permissão iOS `NSLocationWhenInUseUsageDescription`).
 - **Consequências**: Dependência `expo-location@~18.0.10` adicionada (motivo claro: contrato do backend); `Task` estendido com `tipo?`/`confirmation?` opcionais; Kanban de 4 status e TaskDetailModal NÃO alterados (fluxo de tarefas gerais preservado).
+
+## DEC-008: Carteira por região + Check-in GPS na fazenda (Task 1.2, 2026-09-28)
+- **Data**: 2026-09-28
+- **Contexto**: A vendedora precisa da carteira de clientes filtrada pela própria região e de registrar presença nas fazendas com GPS. O backend (Task 1.1) ainda NÃO expõe `GET /regions` nem endpoint de check-in de cliente/fazenda; o único contrato de check-in real do web é `PATCH /appointments/:id/checkin`.
+- **Decisão**:
+  - `regions.service.ts`: consumir `GET /regions` com **fallback offline** para `DEFAULT_REGIONS` (Polo Vale do Ribeira, Polo Oeste, Litoral Leste, Morada Nova — mesmos nomes do protótipo). A carteira funciona mesmo antes do endpoint existir.
+  - Filtro da carteira por região é **client-side** por `uf`/`cidade` do `Cliente` (o modelo não tem campo região).
+  - `checkin.service.ts`: verificação por **geofence** (centro + raio, haversine); registro local offline-first em AsyncStorage (`recordCheckin`); sync de registros vinculados a compromisso via `PATCH /appointments/:id/checkin`; visitas de fazenda sem vínculo ficam como `LOCAL` (CRM diário simplificado).
+  - Telas `/carteira` e `/checkin` seguem os tokens do design system e targets ≥44dp. Rotas no `_layout` + launcher `/modules`.
+- **Consequências**: Nenhum endpoint inventado; sem alteração no sync engine principal (evita regressão nos testes existentes). Quando o backend entregar `/regions` com centro/raio, o geofence passa a validar com precisão de verdade; hoje valida por uf/cidade + fallback. `App` ganhou permissões Android de localização (`ACCESS_FINE/COARSE_LOCATION`).
+
+## DEC-009: Rodada corretiva (QA) — contrato real de regions/clients + limpeza de arquivos soltos (2026-09-28)
+- **Data**: 2026-09-28
+- **Contexto**: QA não aprovou o entregável 1.2 porque o backend passou a entregar o contrato real: `GET /regions` retorna `Paginated<Region>` com `centerLat/centerLng/radiusKm` opcionais (nullable), e o `Cliente` agora tem `status: 'ativo'|'inativo'` (separado de `statusLead`) além de `regiaoId`. Também apontou arquivos soltos de outro agente (regiões hardcoded + GPS mockado) como não desplegáveis.
+- **Decisão**:
+  - **Geofence real**: `Region` (mobile) mudou para `centerLat/centerLng/radiusKm: number | null`. `verifyRegion` (`checkin.service.ts`) VALIDA por raio em km quando as coordenadas estão presentes; quando `null`, assume válida (fallback por uf/cidade na carteira). `normalizeRegion` (`regions.service.ts`) agora lê `centerLat/centerLng/radiusKm` opcionais (+ `descricao/vendedoraId/ativa`).
+  - **Status do cliente**: `Cliente` ganhou `status?: 'ativo'|'inativo'` e `regiaoId?`. `regions.service.ts` ganhou `isActiveClient` e `filterCarteira` (só clientes ATIVOS da região). `clientBelongsToRegion` prioriza o vínculo real `regiaoId`, com fallback uf/cidade. `/carteira` e `/checkin` usam `filterCarteira`.
+  - **Arquivos soltos**: `src/app/cadastro-cliente.tsx` e `src/hooks/useCadastroCliente.ts` ELIMINADOS — protótipo não desplegável (regiões hardcoded, GPS mockado, campos `ativo boolean`/`cotaBonificacaoMensal` que não correspondem ao novo contrato `status`/`regiaoId`, `@react-native-picker/picker` não instalado, sem rota). Não existe `cadastro-cliente.service.ts`. O hook não era reutilizável no estado mock/hardcoded.
+- **Consequências**: O geofence agora valida com os valores reais da API; queda para uf/cidade só quando a região não traz coordenadas. Carteira e check-in listam apenas clientes ativos da região. `verify.sh` VERDE (47 suites / 315 testes).
