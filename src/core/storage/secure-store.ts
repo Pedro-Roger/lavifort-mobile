@@ -48,4 +48,16 @@ export const secureStorage = {
   async removeAuthToken(): Promise<void> {
     return this.removeItem(STORAGE_KEYS.AUTH_TOKEN);
   },
+
+  async getRefreshToken(): Promise<string | null> {
+    return this.getItem(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
+  },
+
+  async setRefreshToken(token: string): Promise<void> {
+    return this.setItem(STORAGE_KEYS.AUTH_REFRESH_TOKEN, token);
+  },
+
+  async removeRefreshToken(): Promise<void> {
+    return this.removeItem(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
+  },
 };

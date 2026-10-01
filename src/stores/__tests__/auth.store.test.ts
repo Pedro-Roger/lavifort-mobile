@@ -15,6 +15,9 @@ jest.mock('../../core/storage', () => ({
     getAuthToken: jest.fn(),
     setAuthToken: jest.fn(),
     removeAuthToken: jest.fn(),
+    getRefreshToken: jest.fn(),
+    setRefreshToken: jest.fn(),
+    removeRefreshToken: jest.fn(),
   },
   localStorage: {
     getItem: jest.fn(),

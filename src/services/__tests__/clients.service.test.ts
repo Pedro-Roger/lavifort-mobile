@@ -25,6 +25,7 @@ const mockClient = (overrides: Partial<Cliente> = {}): Cliente => ({
   birthdate: null,
   cpfCnpj: '12345678',
   statusLead: 'NOVO',
+  regiaoId: null,
   origem: null,
   pais: 'Uruguay',
   cidade: 'Montevideo',

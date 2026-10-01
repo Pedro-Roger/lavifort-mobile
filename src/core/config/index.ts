@@ -11,6 +11,7 @@ export const ENV = {
 
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'larvifort_auth_token',
+  AUTH_REFRESH_TOKEN: 'larvifort_auth_refresh_token',
   AUTH_USER: 'larvifort_auth_user',
   OUTBOX_QUEUE: 'larvifort_outbox_queue',
   LOCAL_TASKS: 'larvifort_local_tasks',

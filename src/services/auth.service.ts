@@ -5,6 +5,8 @@ interface RawBackendAuthResponse {
   token?: string;
   accessToken?: string;
   access_token?: string;
+  refreshToken?: string;
+  refresh_token?: string;
   user?: User;
   usuario?: User;
   data?: RawBackendAuthResponse;
@@ -27,6 +29,14 @@ export const authService = {
       normalized.access_token ||
       '';
 
+    // O backend rotaciona o refresh token em cada login/refresh
+    // (POST /auth/refresh). Sem ele, o app não consegue renovar o
+    // access token de curta duração (JWT_EXPIRES_IN=15m no backend).
+    const refreshToken =
+      normalized.refreshToken ||
+      normalized.refresh_token ||
+      undefined;
+
     const rawUser = normalized.user || normalized.usuario;
     const user: User = rawUser || {
       id: 'usr_' + Date.now(),
@@ -37,6 +47,7 @@ export const authService = {
     return {
       token,
       user,
+      refreshToken,
     };
   },
 

@@ -37,6 +37,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
 
       await secureStorage.setAuthToken(authData.token);
+      if (authData.refreshToken) {
+        await secureStorage.setRefreshToken(authData.refreshToken);
+      }
       await localStorage.setItem(STORAGE_KEYS.AUTH_USER, authData.user);
 
       set({
@@ -115,6 +118,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true });
     try {
       await secureStorage.removeAuthToken();
+      await secureStorage.removeRefreshToken();
       await localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
     } finally {
       set({

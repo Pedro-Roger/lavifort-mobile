@@ -297,6 +297,62 @@ export type ClienteStatus = (typeof CLIENT_STATUSES)[number];
 
 export type ClienteOperationalStatus = 'ativo' | 'inativo';
 
+/**
+ * Payload de criação de cliente (paridade com CreateClientDto do backend).
+ * vendedoraId: atribuição direta da vendedora responsável (além da região).
+ */
+export interface CreateClientInput {
+  firstName: string;
+  lastName: string;
+  email?: string | null;
+  phone?: string | null;
+  cpfCnpj?: string | null;
+  statusLead?: ClienteStatus;
+  status?: ClienteOperationalStatus;
+  origem?: string | null;
+  pais?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  endereco?: string | null;
+  observacoes?: string | null;
+  empresaId?: string | null;
+  vendedoraId?: string | null;
+  regiaoId?: string | null;
+}
+
+/** Cliente cadastrado offline aguardando envio (fila local). */
+export interface PendingClientRecord {
+  id: string;
+  input: CreateClientInput;
+  clientName: string;
+  createdAt: string;
+}
+
+/** Produto simplificado para seleção rápida em campo (GET /products). */
+export interface ProductOption {
+  id: string;
+  name: string;
+  unit: string;
+  price: number | null;
+}
+
+/** Vendedora para atribuição de cliente (GET /users). */
+export interface SalesRep {
+  id: string;
+  nome: string;
+  email: string;
+  role: string;
+}
+
+/** Pedido cadastrado offline aguardando envio (fila local). */
+export interface PendingOrderRecord {
+  id: string;
+  input: CreateOrderInput;
+  clientName: string;
+  total: number;
+  createdAt: string;
+}
+
 export interface Cliente {
   id: string;
   firstName: string;
