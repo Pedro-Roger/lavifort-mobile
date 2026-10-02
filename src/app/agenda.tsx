@@ -148,7 +148,7 @@ export default function AgendaScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backButtonText}>‹ Atrás</Text>
+          <Text style={styles.backButtonText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Agenda</Text>
 

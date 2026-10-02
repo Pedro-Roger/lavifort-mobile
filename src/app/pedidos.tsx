@@ -29,7 +29,7 @@ export default function PedidosScreen() {
       const data = await ordersService.getOrders();
       setOrders(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar pedidos');
+      setError(err instanceof Error ? err.message : 'Erro ao carregar os pedidos');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -58,30 +58,30 @@ export default function PedidosScreen() {
       return (
         <View style={styles.centerBox} testID="pedidos-loading">
           <ActivityIndicator size="large" color={colors.brand[600]} />
-          <Text style={styles.centerHint}>Cargando pedidos...</Text>
+          <Text style={styles.centerHint}>Carregando pedidos...</Text>
         </View>
       );
     }
     return (
       <View style={styles.centerBox} testID="pedidos-empty">
-        <Text style={styles.emptyTitle}>No hay pedidos</Text>
-        <Text style={styles.emptyHint}>Creá tu primer pedido desde el botón superior.</Text>
+        <Text style={styles.emptyTitle}>Nenhum pedido</Text>
+        <Text style={styles.emptyHint}>Crie seu primeiro pedido pelo botão acima.</Text>
       </View>
     );
   };
 
   const renderError = () => (
     <View style={styles.centerBox} testID="pedidos-error">
-      <Text style={styles.emptyTitle}>No se pudieron cargar los pedidos</Text>
+      <Text style={styles.emptyTitle}>Não foi possível carregar os pedidos</Text>
       <Text style={styles.emptyHint}>{error}</Text>
       <TouchableOpacity
         onPress={() => loadOrders()}
         style={styles.retryButton}
         accessibilityRole="button"
-        accessibilityLabel="Reintentar"
+        accessibilityLabel="Tentar novamente"
         testID="pedidos-retry-button"
       >
-        <Text style={styles.retryButtonText}>Reintentar</Text>
+        <Text style={styles.retryButtonText}>Tentar novamente</Text>
       </TouchableOpacity>
     </View>
   );
@@ -93,23 +93,23 @@ export default function PedidosScreen() {
         <TouchableOpacity
           testID="pedidos-back-button"
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel="Voltar"
           style={styles.headerBack}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.headerBackText}>‹ Atrás</Text>
+          <Text style={styles.headerBackText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Pedidos</Text>
         <TouchableOpacity
           testID="pedidos-create-button"
           accessibilityRole="button"
-          accessibilityLabel="Crear pedido"
+          accessibilityLabel="Criar pedido"
           style={styles.createButton}
           onPress={() => setIsCreateOpen(true)}
           activeOpacity={0.7}
         >
-          <Text style={styles.createButtonText}>+ Nuevo</Text>
+          <Text style={styles.createButtonText}>+ Novo</Text>
         </TouchableOpacity>
       </View>
 
@@ -168,7 +168,7 @@ function OrderDetailModal({ order, visible, onClose }: { order: Order | null; vi
           onPress={onClose}
           style={styles.detailClose}
           accessibilityRole="button"
-          accessibilityLabel="Cerrar detalle"
+          accessibilityLabel="Fechar detalhe"
           testID="pedidos-detail-close"
         >
           <Text style={styles.detailCloseText}>✕</Text>

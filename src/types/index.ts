@@ -524,3 +524,61 @@ export interface RegionVerification {
   inside: boolean;
   distanceKm: number;
 }
+
+/* =========================================================================
+ * Pesquisa de Campo (Field Research) — paridade com lavifort-API /pesquisas
+ * (rotas /pesquisas e /searches; CreateFieldSearchDto). Questionário de
+ * pós-larvas preenchido pela vendedora em campo, com fila offline.
+ * ========================================================================= */
+
+export type Uniformidade = 'OTIMA' | 'BOA' | 'REGULAR' | 'RUIM';
+
+export interface FieldSearch {
+  id: string;
+  clienteId: string;
+  clienteNome: string;
+  /** Data da pesquisa (ISO). */
+  dataPesquisa: string;
+  responsavelId: string | null;
+  responsavelNome: string | null;
+  /** Marcas de pós-larvas utilizadas (strings livres no contrato). */
+  larvas: string[];
+  maioriaLarvifort: boolean;
+  parouLarvifort: boolean;
+  motivosSaida: string[];
+  outroMotivo: string | null;
+  uniformidadeBercario: Uniformidade | null;
+  uniformidadeCultivo: Uniformidade | null;
+  /** Sobrevivência 0–100 (%). */
+  sobrevBercario: number | null;
+  sobrevCultivo: number | null;
+  resultadosUltimoCiclo: string | null;
+  observacoes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FieldSearchInput {
+  clienteId: string;
+  dataPesquisa?: string | null; // YYYY-MM-DD
+  responsavelId?: string | null;
+  larvas: string[];
+  maioriaLarvifort: boolean;
+  parouLarvifort?: boolean;
+  motivosSaida?: string[];
+  outroMotivo?: string | null;
+  uniformidadeBercario?: Uniformidade | null;
+  uniformidadeCultivo?: Uniformidade | null;
+  sobrevBercario?: number | null;
+  sobrevCultivo?: number | null;
+  resultadosUltimoCiclo?: string | null;
+  observacoes?: string | null;
+}
+
+/** Pesquisa preenchida offline aguardando POST /pesquisas (fila local). */
+export interface PendingFieldSearchRecord {
+  id: string;
+  input: FieldSearchInput;
+  clientName: string;
+  createdAt: string;
+}

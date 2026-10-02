@@ -173,7 +173,7 @@ export default function AtividadesScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backButtonText}>‹ Atrás</Text>
+          <Text style={styles.backButtonText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Atividades</Text>
       </View>

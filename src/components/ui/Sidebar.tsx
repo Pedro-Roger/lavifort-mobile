@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, spacing, typography, radii } from '@/core/theme';
-import { LayoutDashboard, Columns, Package, Truck, Users, Archive, RefreshCw, CheckSquare, Calendar } from 'lucide-react-native';
+import { colors, spacing, typography } from '@/core/theme';
+import larvifortLogo from '@/assets/larvifort-logo.png';
+import { LayoutDashboard, Columns, Package, Truck, Users, Archive, RefreshCw, CheckSquare, Calendar, ClipboardList } from 'lucide-react-native';
 
 export interface SidebarProps {
   visible: boolean;
@@ -14,6 +15,7 @@ const MODULES = [
   { id: 'kanban', label: 'Quadro / Kanban', icon: Columns, route: '/' },
   { id: 'atividades', label: 'Atividades', icon: CheckSquare, route: '/atividades' },
   { id: 'agenda', label: 'Agenda', icon: Calendar, route: '/agenda' },
+  { id: 'pesquisas', label: 'Pesquisa de Campo', icon: ClipboardList, route: '/pesquisas' },
   { id: 'pedidos', label: 'Pedidos', icon: Package, route: '/pedidos' },
   { id: 'entregas', label: 'Entregas', icon: Truck, route: '/entregas' },
   { id: 'clientes', label: 'Clientes', icon: Users, route: '/clientes' },
@@ -38,9 +40,12 @@ export function Sidebar({ visible, onClose }: SidebarProps) {
         
         <Animated.View style={styles.sidebar}>
           <View style={styles.header}>
-            <View style={styles.brandBadge}>
-              <Text style={styles.brandBadgeText}>LF</Text>
-            </View>
+            <Image
+              source={larvifortLogo}
+              style={styles.headerLogo}
+              resizeMode="contain"
+              testID="sidebar-logo"
+            />
             <Text style={styles.headerTitle}>Menu Módulos</Text>
           </View>
 
@@ -95,19 +100,10 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.neutral.border,
     backgroundColor: colors.brand[50],
   },
-  brandBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: radii.md,
-    backgroundColor: colors.brand[600],
-    justifyContent: 'center',
-    alignItems: 'center',
+  headerLogo: {
+    width: 96,
+    height: 29,
     marginRight: spacing.sm,
-  },
-  brandBadgeText: {
-    color: '#ffffff',
-    fontSize: typography.fontSizes.base,
-    fontWeight: typography.fontWeights.bold,
   },
   headerTitle: {
     fontSize: typography.fontSizes.lg,

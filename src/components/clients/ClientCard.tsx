@@ -16,7 +16,7 @@ function getFullName(client: Cliente): string {
 
 function getLocationLabel(client: Cliente): string {
   const parts = [client.cidade, client.uf].filter(Boolean);
-  return parts.length > 0 ? parts.join(', ') : 'Sin ubicación';
+  return parts.length > 0 ? parts.join(', ') : 'Sem localização';
 }
 
 export function ClientCard({ client, testID }: ClientCardProps) {

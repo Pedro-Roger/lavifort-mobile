@@ -20,8 +20,8 @@ export function getNextDeliveryStatus(status: string): DeliveryStatus | null {
 
 export function DeliveryCard({ delivery, isAdvancing = false, onAdvance }: DeliveryCardProps) {
   const config = deliveryStatusConfig[delivery.status as DeliveryStatus] ?? {
-    label: delivery.status || 'Desconocido',
-    actionLabel: 'Avanzar',
+    label: delivery.status || 'Desconhecido',
+    actionLabel: 'Avançar',
     bg: colors.neutral.surfaceSubtle,
     text: colors.neutral.textSecondary,
     border: colors.neutral.border,

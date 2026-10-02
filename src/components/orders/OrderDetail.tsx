@@ -37,7 +37,7 @@ export function OrderDetail({ order, testID = 'order-detail' }: OrderDetailProps
       </View>
 
       <View style={styles.clientRow}>
-        <Text style={styles.clientName}>{order.clientName || 'Cliente sin nombre'}</Text>
+        <Text style={styles.clientName}>{order.clientName || 'Cliente sem nome'}</Text>
         <Badge
           label={status.label}
           backgroundColor={status.bg}
@@ -49,7 +49,7 @@ export function OrderDetail({ order, testID = 'order-detail' }: OrderDetailProps
       </View>
 
       <View style={styles.dates}>
-        <Text style={styles.dateLabel}>Fecha: {formatDate(order.orderDate)}</Text>
+        <Text style={styles.dateLabel}>Data: {formatDate(order.orderDate)}</Text>
         {order.deliveryDate && (
           <Text style={styles.dateLabel}>Entrega: {formatDate(order.deliveryDate)}</Text>
         )}
@@ -57,7 +57,7 @@ export function OrderDetail({ order, testID = 'order-detail' }: OrderDetailProps
 
       {order.items && order.items.length > 0 && (
         <View style={styles.itemsSection}>
-          <Text style={styles.sectionLabel}>Items</Text>
+          <Text style={styles.sectionLabel}>Itens</Text>
           {order.items.map((item) => (
             <View key={item.id} style={styles.itemRow} testID={`order-item-${item.id}`}>
               <Text style={styles.itemName} numberOfLines={2}>
@@ -81,13 +81,13 @@ export function OrderDetail({ order, testID = 'order-detail' }: OrderDetailProps
         )}
         {order.discount > 0 && (
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Descuento</Text>
+            <Text style={styles.totalLabel}>Desconto</Text>
             <Text style={styles.totalValue}>-{formatMoney(order.discount)}</Text>
           </View>
         )}
         {order.shippingCost > 0 && (
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Envío</Text>
+            <Text style={styles.totalLabel}>Frete</Text>
             <Text style={styles.totalValue}>{formatMoney(order.shippingCost)}</Text>
           </View>
         )}

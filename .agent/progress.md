@@ -2,34 +2,46 @@
 
 ## Current Task
 
-`MOB-020` (Task 1.2) — Carteira por região da vendedora + Check-in GPS + CRM
-offline/simplificado. **Rodada corretiva pós-QA aplicada e VERDE.**
-`./scripts/verify.sh` → **VERIFICATION_PASS** (47 suites / 315 testes).
+**Módulo Pesquisa de Campo (2026-10-01)** — tela `/pesquisas` + service
+`GET/POST /pesquisas` + fila offline (padrão clients/checkin). Atalhos: Sidebar
+da home + launcher `/modules`. `./scripts/verify.sh` → **VERIFICATION_PASS**
+(48 suites / 329 testes, +8 testes de pesquisas).
 
 ## Status
 
-TASK_1_2_CORRECTIVE_DONE.
+FIELD_RESEARCH_DONE.
 
-## Rodada corretiva (QA) — contrato real + limpeza
+## Implementação
 
-- **Geofence real**: `Region` mobile agora `centerLat/centerLng/radiusKm: number | null`
-  (paridade com o backend). `verifyRegion` em `services/checkin.service.ts` valida por
-  raio em km quando há coordenadas; `null` → fallback (uf/cidade na carteira).
-- **Status do cliente**: `Cliente` ganhou `status?: 'ativo'|'inativo'` e `regiaoId?`.
-  `regions.service.ts`: `isActiveClient` + `filterCarteira` (só ativos da região);
-  `clientBelongsToRegion` prioriza `regiaoId`. `/carteira` e `/checkin` usam `filterCarteira`.
-- **Arquivos soltos (outro agente) ELIMINADOS**: `src/app/cadastro-cliente.tsx` +
-  `src/hooks/useCadastroCliente.ts` (protótipo: regiões hardcoded, GPS mockado, campos
-  fora do contrato, sem rota). Não existe `cadastro-cliente.service.ts`.
+- `src/services/pesquisas.service.ts`: GET `/pesquisas` (alias /searches no
+  backend; lista paginada, filtros clienteId/responsavelId/startDate/endDate),
+  POST `/pesquisas` (CreateFieldSearchDto), normalização tolerante
+  (normalizeFieldSearch), fila `pendingSearchesQueue` (OfflineQueue em
+  `services/offline-queue.ts`), `savePendingSearch`, `syncPendingSearches`
+  (400/422 descarta; rede falha mantém), `getSearchesWithPending`.
+- `src/components/pesquisas/`: `FieldSearchCard` (badges de uniformidade,
+  chips de larvas, badge "Pendente de envio") e `FieldSearchFormModal`
+  (questionário completo: cliente com busca, data, pós-larvas chips+outra,
+  maioria Larvifort obrigatório, parou/motivos de saída, uniformidade
+  berçário/cultivo, sobrevivência %, resultados/observações).
+- `src/app/pesquisas.tsx`: lista remota + pendências locais, auto-sync
+  best-effort ao abrir, botão "Sincronizar pendentes", salvamento offline com
+  Alert "Salvo no aparelho".
+- Rotas: `_layout.tsx` (pesquisas), `modules.tsx` (launcher),
+  `Sidebar.tsx` (atalho na home, ícone ClipboardList).
+- Tipos: `Uniformidade`, `FieldSearch`, `FieldSearchInput`,
+  `PendingFieldSearchRecord`.
+- Teste: `pesquisas.service.test.ts` 8/8 (list/normalize/filters/POST/pendency
+  queue/sync 400+network/flat clienteNome).
 
 ## Validation
 
 - `./scripts/verify.sh` → **VERIFICATION_PASS** (typecheck ✓, ESLint ✓,
-  47 suites / 315 testes PASS, incl. regions 16 + checkin 9 novos).
+  48 suites / 329 testes PASS).
 
 ## Next Action
 
-TechLead homologa a rodada corretiva. Backlog `MOB-019` segue pendente.
+TechLead homologa. Pendências de homologação anteriores permanecem stageadas.
 
 ---
 

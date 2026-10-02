@@ -8,33 +8,34 @@ import { ModuleGrid, ModuleEntry } from '@/components/modules/ModuleGrid';
 /**
  * Launcher de módulos del CRM. Inventario honesto: los módulos ya
  * implementados navegan a su ruta; el resto marca estado "Próximamente"
- * (sin UI inventada ni decoración).
+ * (sem UI inventada nem decoração).
  */
 export default function ModulesScreen() {
   const router = useRouter();
 
   const modules: ModuleEntry[] = [
-    { route: '/', label: 'Dashboard', shortLabel: 'DB', description: 'Tareas y tablero del operador' },
-    { route: '/', label: 'Quadro / Kanban', shortLabel: 'QB', description: 'Columnas y cards por estado' },
-    { route: '/pedidos', label: 'Pedidos', shortLabel: 'PD', description: 'Consulta y creación de pedidos' },
-    { route: '/entregas', label: 'Entregas', shortLabel: 'EN', description: 'Estado y confirmación de entregas' },
-    { route: '/clientes', label: 'Clientes', shortLabel: 'CL', description: 'Lista y detalle de clientes' },
-    { route: '/estoque', label: 'Estoque', shortLabel: 'ES', description: 'Disponibilidad de productos' },
+    { route: '/', label: 'Dashboard', shortLabel: 'DB', description: 'Tarefas e painel do operador' },
+    { route: '/', label: 'Quadro / Kanban', shortLabel: 'QB', description: 'Colunas e cards por status' },
+    { route: '/pedidos', label: 'Pedidos', shortLabel: 'PD', description: 'Consulta e criação de pedidos' },
+    { route: '/entregas', label: 'Entregas', shortLabel: 'EN', description: 'Estado e confirmação de entregas' },
+    { route: '/clientes', label: 'Clientes', shortLabel: 'CL', description: 'Lista e detalhe de clientes' },
+    { route: '/estoque', label: 'Estoque', shortLabel: 'ES', description: 'Disponibilidade de produtos' },
     { route: '/atividades', label: 'Atividades', shortLabel: 'AT', description: 'Concluir atividades de campo' },
-    { route: '/sync-status', label: 'Sincronización', shortLabel: 'SY', description: 'Estado de red y fila Outbox' },
-    { route: '/agenda', label: 'Agenda', shortLabel: 'AG', description: 'Visitas y reuniones' },
-    { route: '/carteira', label: 'Carteira', shortLabel: 'CA', description: 'Clientes por región de la vendedora' },
-    { route: '/checkin', label: 'Check-in GPS', shortLabel: 'CK', description: 'Marcar presencia en las fincas' },
-    { route: null, label: 'Empresas', shortLabel: 'EM', description: 'Empresas y entidades' },
-    { route: null, label: 'Laboratório', shortLabel: 'LB', description: 'Análisis y ensayos' },
-    { route: null, label: 'Separação', shortLabel: 'SP', description: 'Armado y picking' },
-    { route: null, label: 'Logística', shortLabel: 'LG', description: 'Rutas y planificación' },
-    { route: null, label: 'Pós-venda', shortLabel: 'PV', description: 'Seguimiento post venta' },
-    { route: null, label: 'Fiscal', shortLabel: 'FC', description: 'Documentos y cobros' },
-    { route: null, label: 'Métricas', shortLabel: 'MT', description: 'Indicadores y gráficas' },
-    { route: null, label: 'Pesquisa', shortLabel: 'PS', description: 'Búsqueda global' },
-    { route: null, label: 'Equipe', shortLabel: 'EQ', description: 'Miembros del equipo' },
-    { route: null, label: 'Produtos / Unidades', shortLabel: 'PR', description: 'Catálogo y unidades' },
+    { route: '/sync-status', label: 'Sincronização', shortLabel: 'SY', description: 'Estado da rede e fila Outbox' },
+    { route: '/agenda', label: 'Agenda', shortLabel: 'AG', description: 'Visitas e reuniões' },
+    { route: '/carteira', label: 'Carteira', shortLabel: 'CA', description: 'Clientes por região da vendedora' },
+    { route: '/pesquisas', label: 'Pesquisa de Campo', shortLabel: 'PC', description: 'Questionário de pós-larvas em campo' },
+    { route: '/checkin', label: 'Check-in GPS', shortLabel: 'CK', description: 'Marcar presença nas fazendas' },
+    { route: null, label: 'Empresas', shortLabel: 'EM', description: 'Empresas e entidades' },
+    { route: null, label: 'Laboratório', shortLabel: 'LB', description: 'Análises e ensaios' },
+    { route: null, label: 'Separação', shortLabel: 'SP', description: 'Separação e picking' },
+    { route: null, label: 'Logística', shortLabel: 'LG', description: 'Rotas e planejamento' },
+    { route: null, label: 'Pós-venda', shortLabel: 'PV', description: 'Acompanhamento pós-venda' },
+    { route: null, label: 'Fiscal', shortLabel: 'FC', description: 'Documentos e cobranças' },
+    { route: null, label: 'Métricas', shortLabel: 'MT', description: 'Indicadores e gráficos' },
+    { route: null, label: 'Pesquisa', shortLabel: 'PS', description: 'Busca global' },
+    { route: null, label: 'Equipe', shortLabel: 'EQ', description: 'Membros da equipe' },
+    { route: null, label: 'Produtos / Unidades', shortLabel: 'PR', description: 'Catálogo e unidades' },
   ];
 
   return (
@@ -44,19 +45,19 @@ export default function ModulesScreen() {
         <TouchableOpacity
           testID="modules-back-button"
           accessibilityRole="button"
-          accessibilityLabel="Volver al panel"
+          accessibilityLabel="Voltar ao painel"
           style={styles.headerBack}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.headerBackText}>‹ Atrás</Text>
+          <Text style={styles.headerBackText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Módulos</Text>
       </View>
 
       <View style={styles.subheader}>
         <Text style={styles.subtitle}>
-          Todos los módulos de LarviFort. Los ya disponibles abren su pantalla.
+          Todos os módulos da LarviFort. Os disponíveis abrem a tela.
         </Text>
       </View>
 

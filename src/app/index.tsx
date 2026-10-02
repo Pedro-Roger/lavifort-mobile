@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
+import larvifortLogo from '@/assets/larvifort-logo.png';
 import { Task, StatusTarefa } from '@/types';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSyncStore } from '@/stores/sync.store';
@@ -170,12 +171,15 @@ export default function IndexScreen() {
           >
             <Menu size={24} color={colors.neutral.textPrimary} />
           </TouchableOpacity>
-          <View style={styles.brandBadge}>
-            <Text style={styles.brandBadgeText}>LF</Text>
-          </View>
+          <Image
+            source={larvifortLogo}
+            style={styles.headerLogo}
+            resizeMode="contain"
+            testID="header-logo"
+          />
           <View style={styles.headerText}>
             <Text style={styles.headerTitle} numberOfLines={1}>
-              LarviFort CRM
+              CRM de Campo
             </Text>
             <Text style={styles.headerSubtitle} numberOfLines={1}>
               {user ? user.nome || user.email : 'Painel Operacional'}
@@ -346,10 +350,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  brandBadgeText: {
-    color: '#ffffff',
-    fontSize: typography.fontSizes.sm,
-    fontWeight: typography.fontWeights.bold,
+  headerLogo: {
+    width: 110,
+    height: 33,
   },
   headerTitle: {
     fontSize: typography.fontSizes.base,

@@ -15,7 +15,7 @@ function getFullName(client: Cliente): string {
 }
 
 function formatBoolean(value: boolean): string {
-  return value ? 'Sí' : 'No';
+  return value ? 'Sim' : 'Não';
 }
 
 function LabeledRow({ label, value }: { label: string; value?: string | null }): React.ReactElement | null {
@@ -43,7 +43,7 @@ export function ClientDetail({ client, testID }: ClientDetailProps) {
       <View style={styles.header}>
         <Avatar name={fullName} size={56} testID="client-detail-avatar" backgroundColor="#0284c7" />
         <View style={styles.headerInfo}>
-          <Text style={styles.name}>{fullName || 'Cliente sin nombre'}</Text>
+          <Text style={styles.name}>{fullName || 'Cliente sem nome'}</Text>
           {client.pais && <Text style={styles.subtitle}>{client.pais}</Text>}
           {client.statusLead && (
             <ClientStatusBadge status={client.statusLead} size="md" testID="client-detail-badge" />
@@ -51,39 +51,39 @@ export function ClientDetail({ client, testID }: ClientDetailProps) {
         </View>
       </View>
 
-      <SectionTitle title="Contacto" />
+      <SectionTitle title="Contato" />
       {LabeledRow({ label: 'Email', value: client.email })}
-      {LabeledRow({ label: 'Teléfono', value: client.phone })}
+      {LabeledRow({ label: 'Telefone', value: client.phone })}
       {LabeledRow({ label: 'Documento', value: client.cpfCnpj })}
-      {LabeledRow({ label: 'Origen', value: client.origem })}
+      {LabeledRow({ label: 'Origem', value: client.origem })}
 
-      <SectionTitle title="Ubicación" />
-      {cityUf ? LabeledRow({ label: 'Ciudad / Estado', value: cityUf }) : null}
+      <SectionTitle title="Localização" />
+      {cityUf ? LabeledRow({ label: 'Cidade / UF', value: cityUf }) : null}
       {LabeledRow({ label: 'País', value: client.pais })}
-      {LabeledRow({ label: 'Dirección', value: client.endereco })}
+      {LabeledRow({ label: 'Endereço', value: client.endereco })}
 
-      <SectionTitle title="Perfil acuícola" />
+      <SectionTitle title="Perfil aquícola" />
       {client.laminaAgua > 0
-        ? LabeledRow({ label: 'Lámina de agua (ha)', value: String(client.laminaAgua) })
+        ? LabeledRow({ label: "Lâmina d'água (ha)", value: String(client.laminaAgua) })
         : null}
       {client.qtdViveiros > 0
         ? LabeledRow({ label: 'Viveiros', value: String(client.qtdViveiros) })
         : null}
       {client.densidade > 0
-        ? LabeledRow({ label: 'Densidad', value: String(client.densidade) })
+        ? LabeledRow({ label: 'Densidade', value: String(client.densidade) })
         : null}
       {client.producaoMedia > 0
-        ? LabeledRow({ label: 'Producción media', value: String(client.producaoMedia) })
+        ? LabeledRow({ label: 'Produção média', value: String(client.producaoMedia) })
         : null}
       <View style={styles.row}>
-        <Text style={styles.rowLabel}>Bercario</Text>
+        <Text style={styles.rowLabel}>Berçário</Text>
         <Text style={styles.rowValue}>{formatBoolean(client.temBercario)}</Text>
       </View>
       {client.qtdBercarios > 0
-        ? LabeledRow({ label: 'Bercarios', value: String(client.qtdBercarios) })
+        ? LabeledRow({ label: 'Berçários', value: String(client.qtdBercarios) })
         : null}
       {client.volumeBercarios > 0
-        ? LabeledRow({ label: 'Volumen bercarios', value: String(client.volumeBercarios) })
+        ? LabeledRow({ label: 'Volume de berçários', value: String(client.volumeBercarios) })
         : null}
       <View style={styles.row}>
         <Text style={styles.rowLabel}>Alimentador automático</Text>
@@ -92,7 +92,7 @@ export function ClientDetail({ client, testID }: ClientDetailProps) {
 
       {client.observacoes ? (
         <>
-          <SectionTitle title="Observaciones" />
+          <SectionTitle title="Observações" />
           <Text style={styles.notes}>{client.observacoes}</Text>
         </>
       ) : null}

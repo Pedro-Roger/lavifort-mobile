@@ -34,7 +34,7 @@ export default function EntregasScreen() {
       const data = await deliveriesService.getDeliveries();
       setDeliveries(data);
     } catch {
-      setError('No fue posible cargar las entregas.');
+      setError('Não foi possível carregar as entregas.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -60,7 +60,7 @@ export default function EntregasScreen() {
       const updated = await deliveriesService.updateDeliveryStatus(delivery.id, nextStatus);
       setDeliveries((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
     } catch {
-      Alert.alert('Error', 'No fue posible avanzar el estado de la entrega.');
+      Alert.alert('Erro', 'Não foi possível avançar o estado da entrega.');
     } finally {
       setAdvancingId(null);
     }
@@ -80,7 +80,7 @@ export default function EntregasScreen() {
           <Text style={styles.emptyTitle}>Algo salió mal</Text>
           <Text style={styles.emptyHint}>{error}</Text>
           <Button
-            title="Reintentar"
+            title="Tentar novamente"
             variant="outline"
             onPress={loadDeliveries}
             style={styles.retryButton}
@@ -91,12 +91,12 @@ export default function EntregasScreen() {
     return (
       <View style={styles.centered} testID="deliveries-empty">
         <Text style={styles.emptyTitle}>
-          {statusFilter === 'ALL' ? 'No hay entregas' : 'Sin entregas en este estado'}
+          {statusFilter === 'ALL' ? 'Nenhuma entrega' : 'Sem entregas neste estado'}
         </Text>
         <Text style={styles.emptyHint}>
           {statusFilter === 'ALL'
-            ? 'Cuando se creen entregas, aparecerán aquí.'
-            : 'Prueba con otro filtro de estado.'}
+            ? 'Quando houver entregas, elas aparecerão aqui.'
+            : 'Tente outro filtro de estado.'}
         </Text>
       </View>
     );
@@ -109,12 +109,12 @@ export default function EntregasScreen() {
         <TouchableOpacity
           testID="deliveries-back-button"
           accessibilityRole="button"
-          accessibilityLabel="Volver"
+          accessibilityLabel="Voltar"
           style={styles.backButton}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backButtonText}>‹ Atrás</Text>
+          <Text style={styles.backButtonText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Entregas</Text>
       </View>

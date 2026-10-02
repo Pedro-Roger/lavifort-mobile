@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
+import larvifortLogo from '@/assets/larvifort-logo.png';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
 import { useAuthStore } from '@/stores/auth.store';
@@ -60,10 +62,12 @@ export default function LoginScreen() {
         <Card variant="elevated" style={styles.card}>
           {/* Header */}
           <View style={styles.header}>
-            <View style={styles.logoBadge}>
-              <Text style={styles.logoBadgeText}>LF</Text>
-            </View>
-            <Text style={styles.brandTitle}>LarviFort</Text>
+            <Image
+              source={larvifortLogo}
+              style={styles.logo}
+              resizeMode="contain"
+              testID="login-logo"
+            />
             <Text style={styles.appSubtitle}>CRM Mobile &amp; Operações de Campo</Text>
           </View>
 
@@ -170,24 +174,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.xl,
   },
-  logoBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: radii.md,
-    backgroundColor: colors.brand[600],
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  logoBadgeText: {
-    color: '#ffffff',
-    fontSize: typography.fontSizes.xl,
-    fontWeight: typography.fontWeights.bold,
-  },
-  brandTitle: {
-    fontSize: typography.fontSizes['2xl'],
-    fontWeight: typography.fontWeights.bold,
-    color: colors.neutral.textPrimary,
+  logo: {
+    width: 220,
+    height: 66,
+    marginBottom: spacing.sm,
   },
   appSubtitle: {
     fontSize: typography.fontSizes.sm,

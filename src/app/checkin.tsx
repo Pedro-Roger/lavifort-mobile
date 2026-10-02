@@ -206,7 +206,7 @@ export default function CheckinScreen() {
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.backButtonText}>‹ Atrás</Text>
+          <Text style={styles.backButtonText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Check-in GPS</Text>
       </View>

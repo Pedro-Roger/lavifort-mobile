@@ -59,3 +59,15 @@
   - **Status do cliente**: `Cliente` ganhou `status?: 'ativo'|'inativo'` e `regiaoId?`. `regions.service.ts` ganhou `isActiveClient` e `filterCarteira` (só clientes ATIVOS da região). `clientBelongsToRegion` prioriza o vínculo real `regiaoId`, com fallback uf/cidade. `/carteira` e `/checkin` usam `filterCarteira`.
   - **Arquivos soltos**: `src/app/cadastro-cliente.tsx` e `src/hooks/useCadastroCliente.ts` ELIMINADOS — protótipo não desplegável (regiões hardcoded, GPS mockado, campos `ativo boolean`/`cotaBonificacaoMensal` que não correspondem ao novo contrato `status`/`regiaoId`, `@react-native-picker/picker` não instalado, sem rota). Não existe `cadastro-cliente.service.ts`. O hook não era reutilizável no estado mock/hardcoded.
 - **Consequências**: O geofence agora valida com os valores reais da API; queda para uf/cidade só quando a região não traz coordenadas. Carteira e check-in listam apenas clientes ativos da região. `verify.sh` VERDE (47 suites / 315 testes).
+
+## DEC-010: Bug "atividade não conclui" — causa raiz era JWT de 15m sem refresh no mobile (2026-10-01)
+- **Data**: 2026-10-01
+- **Contexto**: Report do usuário: "as atividades não estão sendo concluídas quando clica em concluir". Diagnóstico sistemático: rota mobile correta (`POST /tasks/:id/confirm-activity`, payload `{latitude, longitude, accuracyMeters}` correto; API deployada responde 401 sem token — rota existe, não 404). Causa real no backend env: `JWT_EXPIRES_IN="15m"` (lavifort-API/.env, injetado em `auth.module.ts:50`), mas o mobile **ignorava o `refreshToken`** retornado pelo login (`{accessToken, refreshToken, user}`) e **não tinha interceptor de 401** — após 15 min, qualquer mutação (confirm-activity, check-in, pedidos...) falhava 401 e caía no erro genérico "Não foi possível concluir a atividade.".
+- **Decisão** (100% client-side, backend NÃO tocado):
+  - `core/config`: `STORAGE_KEYS.AUTH_REFRESH_TOKEN`.
+  - `core/storage/secure-store.ts`: `get/set/removeRefreshToken`.
+  - `services/api.ts`: interceptor de resposta — em 401 (fora de `/auth/login|refresh`), renova via `POST /auth/refresh` (axios direto, single-flight) salva os tokens rotacionados e refaz a request original com o novo Bearer; se o refresh falha, limpa credenciais e rejeita com "Sessão expirada. Faça login novamente...".
+  - `services/auth.service.ts`: retorna `refreshToken` do login. `stores/auth.store.ts`: persiste no login e remove no logout.
+  - Testes: `api.test.ts` (refresh+retry, refresh falho, rotas de auth fora do refresh, non-401 pass-through, single-flight); mocks atualizados em `auth.store.test.ts`; `clients.service.test.ts` alinhado ao shape normalizado (`regiaoId`).
+  - Recriado `src/app/cadastro-cliente.tsx` untracked (quebrado, reapareceu da sessão interrompida de 09-28) — removido novamente.
+- **Consequências**: Sessão se autorrenewa em campo (sem re-login a cada 15 min); todos os endpoints herdam o fix. `verify.sh` VERDE (47 suites / 321 testes). Backend segue com refresh token de 7 dias — sem mudança lá.

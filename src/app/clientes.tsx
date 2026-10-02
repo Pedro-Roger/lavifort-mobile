@@ -36,7 +36,7 @@ export default function ClientesScreen() {
       );
       setClients(Array.isArray(page.items) ? page.items : []);
     } catch {
-      setError('No se pudo cargar los clientes.');
+      setError('Não foi possível carregar os clientes.');
       setClients([]);
     } finally {
       setIsLoading(false);
@@ -62,7 +62,7 @@ export default function ClientesScreen() {
       const client = await clientsService.getClientById(id);
       setSelectedClient(client);
     } catch {
-      setDetailError('No se pudo cargar el detalle.');
+      setDetailError('Não foi possível carregar o detalhe.');
       setSelectedClient(null);
     } finally {
       setDetailLoading(false);
@@ -81,12 +81,12 @@ export default function ClientesScreen() {
           <TouchableOpacity
             testID="clientes-detail-back-button"
             accessibilityRole="button"
-            accessibilityLabel="Volver a la lista de clientes"
+            accessibilityLabel="Voltar para a lista de clientes"
             style={styles.headerBack}
             onPress={handleBack}
             activeOpacity={0.7}
           >
-            <Text style={styles.headerBackText}>‹ Atrás</Text>
+            <Text style={styles.headerBackText}>‹ Voltar</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Cliente</Text>
         </View>
@@ -99,7 +99,7 @@ export default function ClientesScreen() {
           <Card variant="subtle" testID="client-detail-error">
             <Text style={styles.detailErrorText}>{detailError}</Text>
             <Button
-              title="Reintentar"
+              title="Tentar novamente"
               variant="outline"
               onPress={handleRetry}
               testID="client-detail-retry-button"
@@ -121,12 +121,12 @@ export default function ClientesScreen() {
           <TouchableOpacity
             testID="clientes-back-button"
             accessibilityRole="button"
-            accessibilityLabel="Volver al módulo anterior"
+            accessibilityLabel="Voltar ao módulo anterior"
             style={styles.headerBack}
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.headerBackText}>‹ Atrás</Text>
+            <Text style={styles.headerBackText}>‹ Voltar</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Clientes</Text>
         </View>
@@ -134,7 +134,7 @@ export default function ClientesScreen() {
         <View style={styles.searchWrapper}>
           <Input
             testID="clientes-search-input"
-            placeholder="Buscar por nombre o teléfono"
+            placeholder="Buscar por nome ou telefone"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -148,7 +148,7 @@ export default function ClientesScreen() {
           <Card variant="subtle" testID="clientes-error">
             <Text style={styles.errorText}>{error}</Text>
             <Button
-              title="Reintentar"
+              title="Tentar novamente"
               variant="outline"
               onPress={handleRetry}
               testID="clientes-retry-button"
@@ -156,11 +156,11 @@ export default function ClientesScreen() {
           </Card>
         ) : clients.length === 0 ? (
           <View style={styles.emptyWrapper} testID="clientes-empty">
-            <Text style={styles.emptyTitle}>No hay clientes</Text>
+            <Text style={styles.emptyTitle}>Nenhum cliente</Text>
             <Text style={styles.emptyHint}>
               {searchQuery.trim().length > 0
-                ? 'Ningún cliente coincide con la búsqueda.'
-                : 'Los clientes sincronizados aparecerán aquí.'}
+                ? 'Nenhum cliente corresponde à busca.'
+                : 'Os clientes sincronizados aparecerão aqui.'}
             </Text>
           </View>
         ) : (

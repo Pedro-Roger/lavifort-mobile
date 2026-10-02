@@ -39,7 +39,7 @@ export function OrderCard({ order, onPress, style, testID = `order-card-${order.
       </View>
 
       <Text style={styles.clientName} numberOfLines={1}>
-        {order.clientName || 'Cliente sin nombre'}
+        {order.clientName || 'Cliente sem nome'}
       </Text>
 
       <View style={styles.metaRow}>

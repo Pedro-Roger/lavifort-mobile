@@ -30,7 +30,7 @@ interface DraftItem {
 }
 
 const STATUS_LIST: { id: OrderStatus; label: string }[] = [
-  { id: 'ORCAMENTO', label: 'Presupuesto' },
+  { id: 'ORCAMENTO', label: 'Orçamento' },
   { id: 'PEDIDO', label: 'Pedido' },
 ];
 
@@ -116,12 +116,12 @@ export function CreateOrderModal({
 
   const handleSubmit = async () => {
     if (!selectedClient) {
-      setError('Seleccioná un cliente para el pedido');
+      setError('Selecione um cliente para o pedido');
       return;
     }
     const validItems = items.filter((item) => item.productName.trim().length > 0);
     if (validItems.length === 0) {
-      setError('Agregá al menos un item con nombre de producto');
+      setError('Adicione ao menos um item com nome do produto');
       return;
     }
 
@@ -143,7 +143,7 @@ export function CreateOrderModal({
       });
       if (created) onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear el pedido');
+      setError(err instanceof Error ? err.message : 'Erro ao criar o pedido');
     } finally {
       setIsSubmitting(false);
     }
@@ -159,10 +159,10 @@ export function CreateOrderModal({
         <View style={styles.sheetContainer} testID="create-order-sheet">
           <View style={styles.sheetHeader}>
             <View>
-              <Text style={styles.sheetTitle}>Nuevo Pedido</Text>
-              <Text style={styles.sheetSubtitle}>Alta de pedido contra la API</Text>
+              <Text style={styles.sheetTitle}>Novo Pedido</Text>
+              <Text style={styles.sheetSubtitle}>Novo pedido sincronizado com a API</Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton} testID="create-order-close-button" accessibilityRole="button" accessibilityLabel="Cerrar modal">
+            <TouchableOpacity onPress={onClose} style={styles.closeButton} testID="create-order-close-button" accessibilityRole="button" accessibilityLabel="Fechar modal">
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -189,16 +189,16 @@ export function CreateOrderModal({
                     }}
                     style={styles.selectedClientClear}
                     accessibilityRole="button"
-                    accessibilityLabel="Cambiar cliente"
+                    accessibilityLabel="Trocar cliente"
                     testID="create-order-clear-client"
                   >
-                    <Text style={styles.selectedClientClearText}>Cambiar</Text>
+                    <Text style={styles.selectedClientClearText}>Trocar</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <View>
                   <Input
-                    placeholder="Buscar cliente por nombre o CPF..."
+                    placeholder="Buscar cliente por nome ou CPF..."
                     value={clientQuery}
                     onChangeText={handleSearch}
                     testID="create-order-client-search"
@@ -215,7 +215,7 @@ export function CreateOrderModal({
                       style={styles.candidateRow}
                       onPress={() => handleSelectClient(c)}
                       accessibilityRole="button"
-                      accessibilityLabel={`Seleccionar ${c.firstName} ${c.lastName}`}
+                      accessibilityLabel={`Selecionar ${c.firstName} ${c.lastName}`}
                       testID={`create-order-client-${c.id}`}
                     >
                       <Text style={styles.candidateText} numberOfLines={1}>
@@ -241,7 +241,7 @@ export function CreateOrderModal({
                       onPress={() => setStatus(s.id)}
                       activeOpacity={0.7}
                       accessibilityRole="button"
-                      accessibilityLabel={`Seleccionar ${s.label}`}
+                      accessibilityLabel={`Selecionar ${s.label}`}
                       accessibilityState={{ selected: isSelected }}
                     >
                       <Text style={[styles.pillText, isSelected && styles.pillTextSelected]}>{s.label}</Text>
@@ -258,7 +258,7 @@ export function CreateOrderModal({
                 <View key={index} style={styles.itemCard} testID={`create-order-item-${index}`}>
                   <Text style={styles.itemIndex}>Item {index + 1}</Text>
                   <Input
-                    placeholder="Nombre del producto *"
+                    placeholder="Nome do produto *"
                     value={item.productName}
                     onChangeText={(text) => updateItem(index, 'productName', text)}
                     testID={`create-order-item-${index}-name`}
@@ -266,7 +266,7 @@ export function CreateOrderModal({
                   <View style={styles.itemNumberRow}>
                     <View style={styles.itemNumberField}>
                       <Input
-                        label="Cantidad"
+                        label="Quantidade"
                         keyboardType="number-pad"
                         value={item.quantity}
                         onChangeText={(text) => updateItem(index, 'quantity', text)}
@@ -275,7 +275,7 @@ export function CreateOrderModal({
                     </View>
                     <View style={styles.itemNumberField}>
                       <Input
-                        label="Precio unit."
+                        label="Preço unit."
                         keyboardType="decimal-pad"
                         value={item.unitPrice}
                         onChangeText={(text) => updateItem(index, 'unitPrice', text)}
@@ -290,13 +290,13 @@ export function CreateOrderModal({
                       accessibilityRole="button"
                       testID={`create-order-item-${index}-remove`}
                     >
-                      <Text style={styles.removeItemText}>Quitar item</Text>
+                      <Text style={styles.removeItemText}>Remover item</Text>
                     </TouchableOpacity>
                   )}
                 </View>
               ))}
               <TouchableOpacity onPress={addItem} style={styles.addItem} accessibilityRole="button" testID="create-order-add-item">
-                <Text style={styles.addItemText}>+ Agregar item</Text>
+                <Text style={styles.addItemText}>+ Adicionar item</Text>
               </TouchableOpacity>
             </View>
 
@@ -308,15 +308,15 @@ export function CreateOrderModal({
 
             {/* Datos opcionales */}
             <Input
-              label="Fecha de entrega"
-              placeholder="Ej: 2026-10-15"
+              label="Data de entrega"
+              placeholder="Ex: 2026-10-15"
               value={deliveryDate}
               onChangeText={setDeliveryDate}
               testID="create-order-delivery-date"
             />
             <Input
               label="Notas"
-              placeholder="Instrucciones u observaciones..."
+              placeholder="Instruções ou observações..."
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -327,7 +327,7 @@ export function CreateOrderModal({
 
           <View style={styles.actionsFooter}>
             <Button title="Cancelar" variant="outline" size="md" onPress={onClose} disabled={isSubmitting} style={styles.actionButton} testID="create-order-cancel-button" />
-            <Button title="Crear Pedido" variant="primary" size="md" onPress={handleSubmit} isLoading={isSubmitting} style={styles.actionButton} testID="create-order-submit-button" />
+            <Button title="Criar Pedido" variant="primary" size="md" onPress={handleSubmit} isLoading={isSubmitting} style={styles.actionButton} testID="create-order-submit-button" />
           </View>
         </View>
       </KeyboardAvoidingView>

@@ -113,6 +113,12 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="pesquisas"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="agenda"
         options={{
           headerShown: false,

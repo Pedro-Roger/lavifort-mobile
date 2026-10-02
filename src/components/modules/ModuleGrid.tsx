@@ -20,7 +20,7 @@ export interface ModuleGridProps {
 /**
  * Launcher de módulos. Muestra cada módulo como card honesta: los ya
  * implementados navegan (columna brand), los pendientes marcan su estado
- * real ("Próximamente") sin inventar UI ni decoración ai-slop.
+ * real ("Em breve") sin inventar UI ni decoración ai-slop.
  */
 export function ModuleGrid({
   modules,
@@ -67,7 +67,7 @@ export function ModuleGrid({
                   isAvailable ? styles.statusPillTextAvailable : styles.statusPillTextPending,
                 ]}
               >
-                {isAvailable ? 'Abrir' : 'Próximamente'}
+                {isAvailable ? 'Abrir' : 'Em breve'}
               </Text>
             </View>
           </CardComponent>

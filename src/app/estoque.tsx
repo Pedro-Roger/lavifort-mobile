@@ -94,7 +94,7 @@ export default function EstoqueScreen() {
 
     return (
       <View style={styles.stateContainer} testID="stock-empty">
-        <Text style={styles.stateTitle}>Sin disponibilidad registrada</Text>
+        <Text style={styles.stateTitle}>Sem disponibilidade registrada</Text>
         <Text style={styles.stateHint}>
           Sin productos cargados para este módulo. Cuando la API responda con datos, aparecerán acá.
         </Text>
@@ -109,18 +109,18 @@ export default function EstoqueScreen() {
           <TouchableOpacity
             testID="estoque-back-button"
             accessibilityRole="button"
-            accessibilityLabel="Volver atrás"
+            accessibilityLabel="Voltar"
             style={styles.headerBack}
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.headerBackText}>‹ Atrás</Text>
+            <Text style={styles.headerBackText}>‹ Voltar</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Estoque</Text>
         </View>
 
         <View style={styles.stateContainer}>
-          <Text style={styles.stateTitle}>No se pudo cargar la disponibilidad</Text>
+          <Text style={styles.stateTitle}>Não foi possível carregar a disponibilidade</Text>
           <Text style={styles.stateHint}>{error}</Text>
           <TouchableOpacity
             testID="stock-retry-button"
@@ -132,7 +132,7 @@ export default function EstoqueScreen() {
             }}
             activeOpacity={0.8}
           >
-            <Text style={styles.retryButtonText}>Reintentar</Text>
+            <Text style={styles.retryButtonText}>Tentar novamente</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -146,12 +146,12 @@ export default function EstoqueScreen() {
         <TouchableOpacity
           testID="estoque-back-button"
           accessibilityRole="button"
-          accessibilityLabel="Volver atrás"
+          accessibilityLabel="Voltar"
           style={styles.headerBack}
           onPress={() => router.back()}
           activeOpacity={0.7}
         >
-          <Text style={styles.headerBackText}>‹ Atrás</Text>
+          <Text style={styles.headerBackText}>‹ Voltar</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Estoque</Text>
       </View>
@@ -160,7 +160,7 @@ export default function EstoqueScreen() {
       <View style={styles.searchWrapper}>
         <Input
           testID="stock-search-input"
-          placeholder="Buscar por producto, ubicación o unidad..."
+          placeholder="Buscar por produto, local ou unidade..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           containerStyle={styles.searchInput}
