@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },

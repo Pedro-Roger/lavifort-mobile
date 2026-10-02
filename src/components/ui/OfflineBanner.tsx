@@ -8,7 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
-import { colors, spacing, typography, minTouchTarget } from '@/core/theme';
+import { colors, spacing, typography, minTouchTarget, radii } from '@/core/theme';
 import { useSyncStore } from '@/stores/sync.store';
 
 export interface OfflineBannerProps {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   errorDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radii.full,
     backgroundColor: '#dc2626',
     marginRight: spacing.sm,
   },
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   offlineDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radii.full,
     backgroundColor: '#d97706',
     marginRight: spacing.sm,
   },
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   pendingDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radii.full,
     backgroundColor: '#16a34a',
     marginRight: spacing.sm,
   },
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   syncedDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: radii.full,
     backgroundColor: '#10b981',
     marginRight: spacing.sm,
   },

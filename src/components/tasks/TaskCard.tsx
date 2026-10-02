@@ -206,12 +206,12 @@ const styles = StyleSheet.create({
   progressBarTrack: {
     height: 6,
     backgroundColor: colors.neutral.borderSubtle,
-    borderRadius: radii.full,
+    borderRadius: radii.sm,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: radii.full,
+    borderRadius: radii.sm,
   },
   footerRow: {
     flexDirection: 'row',

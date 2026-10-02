@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   larvaChip: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     backgroundColor: colors.brand[50],
     borderWidth: 1,
     borderColor: colors.brand[200],

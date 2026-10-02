@@ -99,7 +99,7 @@ export function CardFooter({
 const styles = StyleSheet.create({
   base: {
     backgroundColor: colors.neutral.surface,
-    borderRadius: radii.lg,
+    borderRadius: radii.md,
     padding: spacing.lg,
   },
   variantDefault: {

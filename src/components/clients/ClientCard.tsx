@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '@/core/theme';
+import { colors, spacing, typography, radii } from '@/core/theme';
 import { Cliente } from '@/types';
 import { Avatar } from '@/components/ui';
 import { ClientStatusBadge } from './ClientStatusBadge';
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     backgroundColor: colors.neutral.surface,
-    borderRadius: 12,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.neutral.border,
     padding: spacing.lg,

@@ -98,11 +98,16 @@ export const spacing = {
 
 export const radii = {
   none: 0,
-  xs: 4,
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
+  xs: 2,
+  /** Pequenos detalhes (ex.: barras de progresso). */
+  sm: 4,
+  /** PADRÃO: cards, botões, inputs, modais, painéis, listas. */
+  md: 6,
+  /** Máximo para badges, chips e pills. */
+  lg: 8,
+  /** Alias para pills/chips (mesmo valor de lg). */
+  pill: 8,
+  /** APENAS elementos naturalmente circulares: avatares, dots, radios, ícones em círculo. */
   full: 9999,
 } as const;
 

@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   countBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     borderWidth: 1,
   },
   countBadgeText: {

@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     minWidth: minTouchTarget,
     justifyContent: 'center',
     paddingHorizontal: spacing.md,
-    borderRadius: radii.full,
+    borderRadius: radii.md,
     backgroundColor: colors.brand[600],
   },
   addButtonText: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     minHeight: minTouchTarget,
     justifyContent: 'center',
     paddingHorizontal: spacing.md,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     backgroundColor: colors.neutral.surface,
     borderWidth: 1,
     borderColor: colors.neutral.border,

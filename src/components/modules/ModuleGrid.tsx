@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   statusPill: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     marginLeft: spacing.sm,
   },
   statusPillAvailable: {

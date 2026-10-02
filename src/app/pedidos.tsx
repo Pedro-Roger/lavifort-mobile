@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
   detailSheet: {
     backgroundColor: colors.neutral.surface,
     padding: spacing.lg,
-    borderTopLeftRadius: radii.xl,
-    borderTopRightRadius: radii.xl,
+    borderTopLeftRadius: radii.md,
+    borderTopRightRadius: radii.md,
   },
   detailClose: {
     alignSelf: 'flex-end',

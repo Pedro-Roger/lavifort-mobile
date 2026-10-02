@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     minHeight: minTouchTarget,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     borderWidth: 1,
     gap: 6,
   },
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   tabBadge: {
     paddingHorizontal: 6,
     paddingVertical: 1,
-    borderRadius: radii.full,
+    borderRadius: radii.lg,
     borderWidth: 1,
   },
   tabBadgeText: {

@@ -36,9 +36,15 @@ describe('Design Tokens', () => {
     expect(minTouchTarget).toBe(44);
   });
 
-  it('provides spacing and radii tokens', () => {
+  it('provides spacing and radii tokens (visual retangular: pequeno arredondamento)', () => {
     expect(spacing.md).toBe(12);
     expect(spacing.lg).toBe(16);
-    expect(radii.md).toBe(8);
+    // Padrão TechLead: cards/botões/inputs/modais = 6; badges/chips máx = 8.
+    expect(radii.sm).toBe(4);
+    expect(radii.md).toBe(6);
+    expect(radii.lg).toBe(8);
+    expect(radii.pill).toBe(8);
+    // Círculos (avatares/dots/FAB circular) continuam full.
+    expect(radii.full).toBe(9999);
   });
 });
