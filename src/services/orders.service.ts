@@ -6,7 +6,17 @@ import {
   OrderStatus,
   OrderPhase,
   Cliente,
+  OrderTracking,
 } from '../types';
+
+/** Mensagem do servidor (Nest) ou fallback — usada para mostrar erro de fechamento. */
+export function extractApiError(err: unknown, fallback: string): string {
+  const msg = (err as { response?: { data?: { message?: string | string[] } } })?.response?.data
+    ?.message;
+  if (Array.isArray(msg)) return msg.join(', ');
+  if (typeof msg === 'string' && msg) return msg;
+  return fallback;
+}
 
 export interface OrdersQueryFilter {
   page?: number;
@@ -41,6 +51,26 @@ export const ordersService = {
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
     const response = await apiClient.post<Order | { data: Order }>('/orders', input);
+    return normalizeApiResponse<Order>(response.data);
+  },
+
+  async getOrderById(id: string): Promise<Order> {
+    const response = await apiClient.get<Order | { data: Order }>(`/orders/${id}`);
+    return normalizeApiResponse<Order>(response.data);
+  },
+
+  /** Linha do tempo por setor (Comercial / Financeiro / Logística). */
+  async getOrderTracking(id: string): Promise<OrderTracking> {
+    const response = await apiClient.get<OrderTracking | { data: OrderTracking }>(
+      `/orders/${id}/tracking`,
+    );
+    const data = normalizeApiResponse<OrderTracking>(response.data);
+    return { ...data, setores: Array.isArray(data?.setores) ? data.setores : [] };
+  },
+
+  /** Fecha o pedido (exige rede e validação do servidor). */
+  async closeOrder(id: string): Promise<Order> {
+    const response = await apiClient.post<Order | { data: Order }>(`/orders/${id}/close`, {});
     return normalizeApiResponse<Order>(response.data);
   },
 

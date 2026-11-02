@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Animated, 
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography } from '@/core/theme';
 import larvifortLogo from '@/assets/larvifort-logo.png';
-import { LayoutDashboard, Columns, Package, Truck, Users, Archive, RefreshCw, CheckSquare, Calendar, ClipboardList } from 'lucide-react-native';
+import { LayoutDashboard, Columns, Package, Users, RefreshCw, Calendar } from 'lucide-react-native';
 
 export interface SidebarProps {
   visible: boolean;
@@ -11,16 +11,12 @@ export interface SidebarProps {
 }
 
 const MODULES = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, route: '/modules' },
-  { id: 'kanban', label: 'Quadro / Kanban', icon: Columns, route: '/' },
-  { id: 'atividades', label: 'Atividades', icon: CheckSquare, route: '/atividades' },
-  { id: 'agenda', label: 'Agenda', icon: Calendar, route: '/agenda' },
-  { id: 'pesquisas', label: 'Pesquisa de Campo', icon: ClipboardList, route: '/pesquisas' },
+  { id: 'home', label: 'Início', icon: LayoutDashboard, route: '/' },
   { id: 'pedidos', label: 'Pedidos', icon: Package, route: '/pedidos' },
-  { id: 'entregas', label: 'Entregas', icon: Truck, route: '/entregas' },
+  { id: 'agenda', label: 'Visitas', icon: Calendar, route: '/agenda' },
   { id: 'clientes', label: 'Clientes', icon: Users, route: '/clientes' },
-  { id: 'estoque', label: 'Estoque', icon: Archive, route: '/estoque' },
   { id: 'sync', label: 'Sincronização', icon: RefreshCw, route: '/sync-status' },
+  { id: 'mais', label: 'Mais módulos', icon: Columns, route: '/modules' },
 ];
 
 export function Sidebar({ visible, onClose }: SidebarProps) {

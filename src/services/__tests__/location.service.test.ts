@@ -6,7 +6,7 @@ jest.mock('expo-location', () => ({
   requestForegroundPermissionsAsync: jest.fn(),
   getCurrentPositionAsync: jest.fn(),
   getLastKnownPositionAsync: jest.fn(),
-  Accuracy: { Balanced: 3 },
+  Accuracy: { Balanced: 3, High: 4 },
 }));
 
 const mockHasServices = Location.hasServicesEnabledAsync as jest.Mock;
@@ -70,5 +70,16 @@ describe('getCheckinCoords', () => {
 
   it('exposes a sane default timeout', () => {
     expect(CHECKIN_LOCATION_TIMEOUT_MS).toBeGreaterThanOrEqual(5000);
+  });
+
+  it('visita: usa precisão High e não cai no último local conhecido', async () => {
+    mockCurrent.mockRejectedValue(new Error('timeout'));
+    mockLastKnown.mockResolvedValue({ coords: { latitude: 1, longitude: 2, accuracy: 5 } });
+
+    await expect(
+      getCheckinCoords(1000, { highAccuracy: true, allowLastKnown: false })
+    ).rejects.toMatchObject({ code: 'UNAVAILABLE' });
+    expect(mockCurrent).toHaveBeenCalledWith({ accuracy: 4 });
+    expect(mockLastKnown).not.toHaveBeenCalled();
   });
 });

@@ -136,11 +136,18 @@ export const checkinService = {
         await apiClient.patch(`/appointments/${record.appointmentId}/checkin`, {
           latitude: record.latitude,
           longitude: record.longitude,
-          accuracy: record.accuracyMeters,
+          accuracyMeters: record.accuracyMeters,
+          clientTimestamp: record.checkedInAt,
         });
         updated.push({ ...record, syncStatus: 'SYNCED' });
         synced += 1;
-      } catch {
+      } catch (err) {
+        // 409 = visita já concluída (idempotente): considera sincronizado.
+        if ((err as { response?: { status?: number } })?.response?.status === 409) {
+          updated.push({ ...record, syncStatus: 'SYNCED' });
+          synced += 1;
+          continue;
+        }
         updated.push(record);
         failed += 1;
       }

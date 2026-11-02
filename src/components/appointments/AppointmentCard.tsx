@@ -1,14 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '@/core/theme';
+import { colors, spacing, typography, radii } from '@/core/theme';
 import { Appointment, TipoCompromisso } from '@/types';
 import { Card, CardBody, Badge, Button } from '@/components/ui';
+import { formatDateUTC, formatDateTimeLocal } from '@/utils/format';
 
 export interface AppointmentCardProps {
   appointment: Appointment;
   isDeleting?: boolean;
   onEdit?: (appointment: Appointment) => void;
   onDelete?: (appointment: Appointment) => void;
+  onConclude?: (appointment: Appointment) => void;
+  isConcluding?: boolean;
+  /** ISO do toque quando a conclusão aguarda envio (outbox). */
+  pendingSince?: string;
   testID?: string;
 }
 
@@ -22,15 +27,6 @@ const TIPO_COLORS: Record<TipoCompromisso, { bg: string; text: string; border: s
   VISITA: { bg: '#fce7f3', text: '#9d174d', border: '#f9a8d4' },
 };
 
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleDateString('pt-BR');
-  } catch {
-    return '—';
-  }
-}
-
 /**
  * Card de compromisso/agendamento.
  *
@@ -42,10 +38,15 @@ export function AppointmentCard({
   isDeleting = false,
   onEdit,
   onDelete,
+  onConclude,
+  isConcluding = false,
+  pendingSince,
   testID = 'appointment-card',
 }: AppointmentCardProps) {
   const tipoConfig = TIPO_COLORS[appointment.tipo];
   const tipoLabel = TIPO_LABELS[appointment.tipo];
+  const isVisit = appointment.tipo === 'VISITA';
+  const concluded = Boolean(appointment.concludedAt);
 
   return (
     <Card testID={testID}>
@@ -60,7 +61,7 @@ export function AppointmentCard({
             borderColor={tipoConfig.border}
             testID={`${testID}-type-badge`}
           />
-          <Text style={styles.dateText}>{formatDate(appointment.data)}</Text>
+          <Text style={styles.dateText}>{formatDateUTC(appointment.data)}</Text>
         </View>
 
         <Text style={styles.title} numberOfLines={2}>
@@ -89,6 +90,31 @@ export function AppointmentCard({
           </Text>
         ) : null}
       </CardBody>
+
+      {isVisit && concluded ? (
+        <View style={[styles.statusBox, styles.doneBox]} testID={`${testID}-done`}>
+          <Text style={styles.doneText}>
+            Concluída · {formatDateTimeLocal(appointment.concludedAt)}
+          </Text>
+        </View>
+      ) : isVisit && pendingSince ? (
+        <View style={[styles.statusBox, styles.pendingBox]} testID={`${testID}-pending`}>
+          <Text style={styles.pendingText}>
+            Pendente de envio · concluída em {formatDateTimeLocal(pendingSince)}
+          </Text>
+        </View>
+      ) : isVisit && onConclude ? (
+        <Button
+          title="Concluir visita"
+          size="sm"
+          isLoading={isConcluding}
+          disabled={isConcluding}
+          onPress={() => onConclude(appointment)}
+          accessibilityLabel={`Concluir visita ${appointment.titulo}`}
+          testID={`${testID}-conclude-button`}
+          style={styles.concludeButton}
+        />
+      ) : null}
 
       <View style={styles.actionsRow}>
         <Button
@@ -148,6 +174,12 @@ const styles = StyleSheet.create({
     color: colors.neutral.textSecondary,
     fontStyle: 'italic',
   },
+  concludeButton: { marginTop: spacing.md },
+  statusBox: { marginTop: spacing.md, padding: spacing.sm, borderRadius: radii.md, borderWidth: 1 },
+  doneBox: { backgroundColor: '#d1fae5', borderColor: '#6ee7b7' },
+  doneText: { color: '#047857', fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.semibold },
+  pendingBox: { backgroundColor: '#fef3c7', borderColor: '#fcd34d' },
+  pendingText: { color: '#b45309', fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.semibold },
   actionsRow: {
     flexDirection: 'row',
     gap: spacing.sm,

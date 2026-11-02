@@ -2,6 +2,14 @@
 
 ## Current Task
 
+**MOB-021 App comercial (2026-11-01)** — Home enxuta (`src/app/index.tsx`), Kanban movido para `/tarefas`,
+Pedidos em 4 passos (`components/orders/orderForm.ts` + `CreateOrderModal`), detalhe `/pedido-detalhe`
+(tracking por setor + fechar pedido), Agenda só de VISITA com "Concluir visita" (GPS alta precisão,
+outbox `APPOINTMENT/CHECKIN`, 409 idempotente). Helpers em `src/utils/format.ts` (datas UTC dd/mm/aaaa).
+`npm run verify` verde: 57 suites / 368 testes. Status: DONE (pendente teste manual em device).
+
+## Current Task
+
 **Módulo Pesquisa de Campo (2026-10-01)** — tela `/pesquisas` + service
 `GET/POST /pesquisas` + fila offline (padrão clients/checkin). Atalhos: Sidebar
 da home + launcher `/modules`. `./scripts/verify.sh` → **VERIFICATION_PASS**

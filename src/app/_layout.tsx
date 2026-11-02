@@ -65,6 +65,18 @@ function RootLayoutNav() {
         }}
       />
       <Stack.Screen
+        name="tarefas"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="pedido-detalhe"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="modules"
         options={{
           headerShown: false,

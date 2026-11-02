@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import IndexScreen from '../index';
+import TarefasScreen from '../tarefas';
 import { useAuthStore } from '../../stores/auth.store';
 import { useSyncStore } from '../../stores/sync.store';
 import { useTasksStore } from '../../stores/tasks.store';
@@ -13,7 +13,7 @@ jest.mock('expo-router', () => ({
   useSegments: () => [],
 }));
 
-describe('IndexScreen (Dashboard / Kanban / Task List)', () => {
+describe('TarefasScreen (Dashboard / Kanban / Task List)', () => {
   const mockInitSync = jest.fn().mockResolvedValue(undefined);
   const mockLoadProjects = jest.fn().mockResolvedValue([]);
   const mockLoadTasks = jest.fn().mockResolvedValue([]);
@@ -79,7 +79,7 @@ describe('IndexScreen (Dashboard / Kanban / Task List)', () => {
 
   it('renders header, project selector, view mode toggle, kanban board, and FAB by default', async () => {
     await renderer.act(async () => {
-      currentTree = renderer.create(<IndexScreen />);
+      currentTree = renderer.create(<TarefasScreen />);
     });
 
     expect(currentTree).toBeDefined();
@@ -100,7 +100,7 @@ describe('IndexScreen (Dashboard / Kanban / Task List)', () => {
     });
 
     await renderer.act(async () => {
-      currentTree = renderer.create(<IndexScreen />);
+      currentTree = renderer.create(<TarefasScreen />);
     });
 
     const root = currentTree!.root;
@@ -109,7 +109,7 @@ describe('IndexScreen (Dashboard / Kanban / Task List)', () => {
 
   it('opens CreateTaskModal when FAB is pressed', async () => {
     await renderer.act(async () => {
-      currentTree = renderer.create(<IndexScreen />);
+      currentTree = renderer.create(<TarefasScreen />);
     });
 
     const root = currentTree!.root;
@@ -125,7 +125,7 @@ describe('IndexScreen (Dashboard / Kanban / Task List)', () => {
 
   it('opens TaskDetailModal when a task card is pressed', async () => {
     await renderer.act(async () => {
-      currentTree = renderer.create(<IndexScreen />);
+      currentTree = renderer.create(<TarefasScreen />);
       await Promise.resolve();
     });
 

@@ -25,25 +25,7 @@ export const STATUS_CONFIG: Record<
   PEDIDO: { bg: '#e0f2fe', text: '#0369a1', border: '#7dd3fc', label: 'Pedido' },
 };
 
-/** Formato moneda con coma decimal (miles con punto). */
-export function formatMoney(value: number): string {
-  if (typeof value !== 'number' || Number.isNaN(value)) value = 0;
-  return `$${value.toLocaleString('es-AR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
-/** Fecha legible (o la cadena cruda si no parsea). */
-export function formatDate(value: string | null | undefined): string {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+export { formatBRL as formatMoney, formatDateUTC as formatDate } from '@/utils/format';
 
 export function formatQuantity(value: number): string {
   if (typeof value !== 'number' || Number.isNaN(value)) return '0';

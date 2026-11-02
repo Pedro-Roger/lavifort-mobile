@@ -147,7 +147,7 @@ export interface LoginCredentials {
 export interface OutboxMutation {
   id: string;
   entityId: string;
-  entityType: 'TASK' | 'PROJECT' | 'ATTACHMENT';
+  entityType: 'TASK' | 'PROJECT' | 'ATTACHMENT' | 'APPOINTMENT';
   action:
     | 'CREATE'
     | 'UPDATE'
@@ -156,7 +156,8 @@ export interface OutboxMutation {
     | 'DELETE'
     | 'TRANSFER'
     | 'UPLOAD_ATTACHMENT'
-    | 'DELETE_ATTACHMENT';
+    | 'DELETE_ATTACHMENT'
+    | 'CHECKIN';
   payload: Record<string, unknown>;
   createdAt: string;
   retryCount: number;
@@ -249,6 +250,12 @@ export interface Order {
   notes: string | null;
   orderDate: string;
   deliveryDate: string | null;
+  horaEntrega?: string | null;
+  localEntrega?: string | null;
+  paymentMethod?: string | null;
+  ciclo?: string | null;
+  /** Status operacional do backend ('FECHADO' quando o pedido já foi fechado). */
+  operationalStatus?: string | null;
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
@@ -270,7 +277,11 @@ export interface CreateOrderInput {
   projectId?: string | null;
   status?: OrderStatus;
   phase?: OrderPhase;
+  ciclo?: 'RASCUNHO' | 'PEDIDO' | 'APROVADO' | 'FATURADO' | 'CANCELADO';
   deliveryDate?: string | null;
+  horaEntrega?: string | null;
+  localEntrega?: string | null;
+  paymentMethod?: string | null;
   deliveryInstructions?: string | null;
   shippingAddress?: Record<string, unknown> | null;
   notes?: string | null;
@@ -284,6 +295,32 @@ export interface CreateOrderInput {
     notes?: string | null;
   }>;
   linkTaskId?: string | null;
+}
+
+export type TrackingSetor = 'Comercial' | 'Financeiro' | 'Logística';
+
+export interface OrderTrackingSetor {
+  setor: TrackingSetor;
+  projetoId: string | null;
+  coluna: string | null;
+  columnId: string | null;
+  taskId: string | null;
+  /** ISO de quando o card entrou na coluna atual. */
+  desde: string | null;
+}
+
+/** Contrato GET /orders/:id/tracking. */
+export interface OrderTracking {
+  orderId: string;
+  orderNumber: string | null;
+  ciclo: string | null;
+  deliveryDate: string | null;
+  horaEntrega: string | null;
+  localEntrega: string | null;
+  paymentMethod: string | null;
+  totalAmount: number;
+  clientName: string | null;
+  setores: OrderTrackingSetor[];
 }
 
 // --- Clientes -------------------------------------------------------------
@@ -448,8 +485,23 @@ export interface Appointment {
   clienteName: string | null;
   empresaId: string | null;
   ownerId: string | null;
+  /** Preenchidos pelo backend após PATCH /appointments/:id/checkin. */
+  concludedAt?: string | null;
+  concludedById?: string | null;
+  checkinLatitude?: number | null;
+  checkinLongitude?: number | null;
+  checkinAccuracyMeters?: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** Body de PATCH /appointments/:id/checkin. */
+export interface AppointmentCheckinInput {
+  latitude: number;
+  longitude: number;
+  accuracyMeters: number;
+  /** ISO do momento do toque (offline-safe). */
+  clientTimestamp: string;
 }
 
 export interface CreateAppointmentInput {

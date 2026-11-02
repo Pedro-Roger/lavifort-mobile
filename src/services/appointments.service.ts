@@ -1,6 +1,9 @@
 import { apiClient, normalizeApiResponse } from './api';
+import { outboxQueue } from './sync/outbox-queue';
+import { networkMonitor } from './sync/network-monitor';
 import {
   Appointment,
+  AppointmentCheckinInput,
   CreateAppointmentInput,
   UpdateAppointmentInput,
 } from '../types';
@@ -15,6 +18,7 @@ import {
  * - POST /appointments (criar)
  * - PATCH /appointments/:id (atualizar)
  * - DELETE /appointments/:id (excluir)
+ * - PATCH /appointments/:id/checkin (concluir visita com localização)
  *
  * Paridade com o backend: a API aceita prefixo /appointments e /compromissos.
  */
@@ -93,6 +97,61 @@ export const appointmentsService = {
       Appointment | { data: Appointment }
     >(`/appointments/${id}`, input);
     return normalizeApiResponse<Appointment>(response.data);
+  },
+
+  /**
+   * Conclui a visita com a localização capturada no toque.
+   * Sem rede (ou falha de rede), grava na outbox com as coordenadas e o
+   * clientTimestamp originais; o sync-engine reenvia depois.
+   * 409 = já concluída (idempotente) → trata como sincronizado.
+   */
+  async concludeVisit(
+    id: string,
+    input: AppointmentCheckinInput,
+  ): Promise<{ status: 'SYNCED'; appointment: Appointment | null } | { status: 'QUEUED' }> {
+    const enqueue = async () => {
+      const already = await this.getPendingCheckins();
+      if (!already[id]) {
+        await outboxQueue.enqueue({
+          entityId: id,
+          entityType: 'APPOINTMENT',
+          action: 'CHECKIN',
+          payload: { ...input },
+        });
+      }
+      return { status: 'QUEUED' as const };
+    };
+
+    if (!networkMonitor.isConnected) return enqueue();
+    try {
+      return { status: 'SYNCED', appointment: await this.sendCheckin(id, input) };
+    } catch (err) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 409) return { status: 'SYNCED', appointment: null };
+      if (status === undefined) return enqueue(); // sem resposta = rede
+      throw err;
+    }
+  },
+
+  /** PATCH cru, usado também pelo sync-engine. */
+  async sendCheckin(id: string, input: AppointmentCheckinInput): Promise<Appointment> {
+    const response = await apiClient.patch<Appointment | { data: Appointment }>(
+      `/appointments/${id}/checkin`,
+      input,
+    );
+    return normalizeApiResponse<Appointment>(response.data);
+  },
+
+  /** Conclusões aguardando envio: appointmentId → clientTimestamp do toque. */
+  async getPendingCheckins(): Promise<Record<string, string>> {
+    const all = await outboxQueue.getAll();
+    const map: Record<string, string> = {};
+    all
+      .filter((m) => m.entityType === 'APPOINTMENT' && m.action === 'CHECKIN')
+      .forEach((m) => {
+        map[m.entityId] = String(m.payload.clientTimestamp ?? m.createdAt);
+      });
+    return map;
   },
 
   /**

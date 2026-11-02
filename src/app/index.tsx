@@ -1,495 +1,165 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Package, CalendarCheck, Users, LogOut, ChevronRight, MoreHorizontal } from 'lucide-react-native';
 import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
 import larvifortLogo from '@/assets/larvifort-logo.png';
-import { Task, StatusTarefa } from '@/types';
+import { Order } from '@/types';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSyncStore } from '@/stores/sync.store';
-import { useTasksStore } from '@/stores/tasks.store';
-import { localDatabase } from '@/services/sync/local-database';
-import { Sidebar, OfflineBanner } from '@/components/ui';
-import { Menu, RefreshCw, LogOut, LayoutGrid } from 'lucide-react-native';
-import {
-  ProjectSelector,
-  TaskList,
-  KanbanBoard,
-  ViewModeToggle,
-  CreateTaskModal,
-  TaskDetailModal,
-} from '@/components/tasks';
+import { ordersService } from '@/services/orders.service';
+import { appointmentsService } from '@/services/appointments.service';
+import { OfflineBanner, Card } from '@/components/ui';
+import { groupVisits } from '@/components/appointments';
+import { PHASE_CONFIG, formatMoney } from '@/components/orders/orderMeta';
 
-export default function IndexScreen() {
+/** Home da vendedora: Pedidos, Visitas e Clientes + resumo do dia. */
+export default function HomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { init: initSync, isConnected, isSyncing, pendingCount, errorCount, syncNow } = useSyncStore();
-  const {
-    tasks,
-    projects,
-    selectedProjectId,
-    loadProjects,
-    selectProject,
-    loadTasks,
-    viewMode,
-    setViewMode,
-    searchQuery,
-    setSearchQuery,
-    statusFilter,
-    setStatusFilter,
-    isRefreshing,
-    refreshTasks,
-    getFilteredTasks,
-    isLoading,
-    createTask,
-    updateTask,
-    updateTaskStatus,
-    updateTaskProgress,
-    deleteTask,
-    transferTask,
-    addSubtask,
-    toggleSubtask,
-    deleteSubtask,
-    captureAndAddPhoto,
-    pickAndAddPhoto,
-    deleteAttachment,
-  } = useTasksStore();
+  const { init: initSync, syncNow, isConnected } = useSyncStore();
+  const [visitsToday, setVisitsToday] = useState<number | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const load = useCallback(async () => {
+    const [v, o] = await Promise.allSettled([
+      appointmentsService.getAppointments({ tipo: 'VISITA' }),
+      ordersService.getOrders({ limit: 5 }),
+    ]);
+    if (v.status === 'fulfilled') {
+      const pending = await appointmentsService.getPendingCheckins().catch(() => ({}));
+      setVisitsToday(groupVisits(v.value, pending)[0].data.length);
+    }
+    if (o.status === 'fulfilled') setOrders(o.value.slice(0, 5));
+    setIsRefreshing(false);
+  }, []);
 
   useEffect(() => {
     initSync();
-    loadProjects().then(() => {
-      loadTasks();
-    });
-  }, [initSync, loadProjects, loadTasks]);
+    load();
+  }, [initSync, load]);
 
-  const filteredTasks = useMemo(() => {
-    return getFilteredTasks();
-  }, [tasks, getFilteredTasks, searchQuery, statusFilter, selectedProjectId]);
+  const go = (route: string) => router.push(route as never);
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
-  const handleSyncPress = async () => {
-    if (isConnected && !isSyncing) {
-      await syncNow(selectedProjectId || undefined);
-      await loadTasks();
-    }
-  };
-
-  const handleTaskPress = (task: Task) => {
-    setSelectedTask(task);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleCloseDetailModal = () => {
-    setIsDetailModalOpen(false);
-    setSelectedTask(null);
-  };
-
-  const handleUpdateStatus = async (id: string, status: StatusTarefa) => {
-    const updated = await updateTaskStatus(id, status);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleUpdateProgress = async (id: string, progresso: number) => {
-    const updated = await updateTaskProgress(id, progresso);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleUpdateTask = async (id: string, updates: Partial<Task>) => {
-    const updated = await updateTask(id, updates);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleAddSubtask = async (taskId: string, titulo: string) => {
-    const updated = await addSubtask(taskId, titulo);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleToggleSubtask = async (taskId: string, subtaskId: string) => {
-    const updated = await toggleSubtask(taskId, subtaskId);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleDeleteSubtask = async (taskId: string, subtaskId: string) => {
-    const updated = await deleteSubtask(taskId, subtaskId);
-    if (updated) setSelectedTask(updated);
-    return updated;
-  };
-
-  const handleCapturePhoto = async (taskId: string) => {
-    const attachment = await captureAndAddPhoto(taskId);
-    if (attachment) {
-      const fresh = await localDatabase.getTaskById(taskId);
-      if (fresh) setSelectedTask(fresh);
-    }
-    return attachment;
-  };
-
-  const handlePickPhoto = async (taskId: string) => {
-    const attachment = await pickAndAddPhoto(taskId);
-    if (attachment) {
-      const fresh = await localDatabase.getTaskById(taskId);
-      if (fresh) setSelectedTask(fresh);
-    }
-    return attachment;
-  };
-
-  const handleDeleteAttachment = async (taskId: string, attachmentId: string) => {
-    const success = await deleteAttachment(taskId, attachmentId);
-    if (success) {
-      const fresh = await localDatabase.getTaskById(taskId);
-      if (fresh) setSelectedTask(fresh);
-    }
-    return success;
-  };
+  const tiles = [
+    { id: 'pedidos', label: 'Pedidos', hint: 'Fazer e acompanhar', icon: Package, route: '/pedidos' },
+    { id: 'visitas', label: 'Visitas', hint: 'Agenda e conclusão', icon: CalendarCheck, route: '/agenda' },
+    { id: 'clientes', label: 'Clientes', hint: 'Lista e detalhes', icon: Users, route: '/clientes' },
+  ];
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <Sidebar visible={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
-      {/* Top Header */}
       <View style={styles.header} testID="app-header">
-        <View style={styles.headerLeft}>
-          <TouchableOpacity
-            testID="sidebar-menu-button"
-            onPress={() => setIsSidebarOpen(true)}
-            style={styles.menuButton}
-            accessibilityRole="button"
-            accessibilityLabel="Abrir menu de navegação"
-          >
-            <Menu size={24} color={colors.neutral.textPrimary} />
-          </TouchableOpacity>
-          <Image
-            source={larvifortLogo}
-            style={styles.headerLogo}
-            resizeMode="contain"
-            testID="header-logo"
-          />
-          <View style={styles.headerText}>
-            <Text style={styles.headerTitle} numberOfLines={1}>
-              CRM de Campo
-            </Text>
-            <Text style={styles.headerSubtitle} numberOfLines={1}>
-              {user ? user.nome || user.email : 'Painel Operacional'}
-            </Text>
-          </View>
+        <Image source={larvifortLogo} style={styles.logo} resizeMode="contain" testID="header-logo" />
+        <View style={styles.flex1}>
+          <Text style={styles.hello} numberOfLines={1}>
+            Olá{user ? `, ${(user.nome || user.email || '').split(' ')[0]}` : ''}
+          </Text>
+          <Text style={styles.sub}>Seu dia comercial</Text>
         </View>
-
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            testID="modules-header-button"
-            onPress={() => router.push('/modules' as any)}
-            style={styles.headerActionButton}
-            accessibilityRole="button"
-            accessibilityLabel="Acessar módulos"
-          >
-            <LayoutGrid size={18} color={colors.neutral.textSecondary} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            testID="sync-status-header-button"
-            onPress={handleSyncPress}
-            style={styles.headerActionButton}
-            accessibilityRole="button"
-            accessibilityLabel="Sincronizar tarefas"
-          >
-            <RefreshCw size={18} color={isSyncing ? colors.brand[600] : colors.neutral.textSecondary} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            testID="logout-header-button"
-            onPress={handleLogout}
-            style={styles.headerActionButton}
-            accessibilityRole="button"
-            accessibilityLabel="Sair do aplicativo"
-          >
-            <LogOut size={18} color={colors.sync.error} />
-          </TouchableOpacity>
-
-          <ViewModeToggle
-            mode={viewMode}
-            onChangeMode={setViewMode}
-            testID="view-mode-toggle"
-          />
-        </View>
+        <TouchableOpacity testID="more-header-button" accessibilityRole="button" accessibilityLabel="Mais módulos" style={styles.iconBtn} onPress={() => go('/modules')}>
+          <MoreHorizontal size={20} color={colors.neutral.textSecondary} />
+        </TouchableOpacity>
+        <TouchableOpacity testID="logout-header-button" accessibilityRole="button" accessibilityLabel="Sair" style={styles.iconBtn} onPress={() => logout()}>
+          <LogOut size={18} color={colors.neutral.textSecondary} />
+        </TouchableOpacity>
       </View>
 
-      {/* Offline Synchronization Banner */}
-      <OfflineBanner testID="offline-banner" />
+      <OfflineBanner testID="offline-banner" onSyncPress={() => syncNow()} onPressBanner={() => go('/sync-status')} />
 
-      {/* Project / Sector Selector */}
-      <View style={styles.selectorWrapper}>
-        <ProjectSelector
-          projects={projects}
-          selectedProjectId={selectedProjectId}
-          onSelectProject={(id) => selectProject(id)}
-          showAllOption
-        />
-      </View>
-
-      {/* Main Board / List View */}
-      <View style={styles.listWrapper}>
-        {viewMode === 'kanban' ? (
-          <KanbanBoard
-            tasks={filteredTasks}
-            isLoading={isLoading}
-            isRefreshing={isRefreshing}
-            onRefresh={refreshTasks}
-            onTaskPress={handleTaskPress}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            testID="kanban-board"
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              setIsRefreshing(true);
+              load();
+            }}
+            colors={[colors.brand[600]]}
+            tintColor={colors.brand[600]}
           />
-
-        ) : (
-          <TaskList
-            tasks={filteredTasks}
-            isLoading={isLoading}
-            isRefreshing={isRefreshing}
-            onRefresh={refreshTasks}
-            onTaskPress={handleTaskPress}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedStatus={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            testID="task-list"
-          />
-        )}
-      </View>
-
-      {/* Floating Action Button (FAB) - Quick Task Creation */}
-      <TouchableOpacity
-        testID="create-task-fab"
-        style={styles.fabButton}
-        onPress={() => setIsCreateModalOpen(true)}
-        activeOpacity={0.8}
-        accessibilityRole="button"
-        accessibilityLabel="Criar nova tarefa"
+        }
       >
-        <Text style={styles.fabIcon}>+</Text>
-        <Text style={styles.fabText}>Nova Tarefa</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.summary} activeOpacity={0.8} onPress={() => go('/agenda')} testID="home-visits-summary" accessibilityRole="button">
+          <Text style={styles.summaryNumber}>{visitsToday ?? '–'}</Text>
+          <View style={styles.flex1}>
+            <Text style={styles.summaryTitle}>{visitsToday === 1 ? 'visita para hoje' : 'visitas para hoje'}</Text>
+            <Text style={styles.summaryHint}>{isConnected ? 'Toque para abrir a agenda' : 'Sem internet — dados podem estar desatualizados'}</Text>
+          </View>
+          <ChevronRight size={20} color={colors.neutral.white} />
+        </TouchableOpacity>
 
-      {/* Create Task Modal */}
-      <CreateTaskModal
-        visible={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        projects={projects}
-        defaultProjectId={selectedProjectId}
-        onCreateTask={createTask}
-        testID="create-task-modal"
-      />
+        <View style={styles.tiles}>
+          {tiles.map((t) => (
+            <TouchableOpacity key={t.id} style={styles.tile} activeOpacity={0.7} onPress={() => go(t.route)} accessibilityRole="button" accessibilityLabel={t.label} testID={`home-tile-${t.id}`}>
+              <View style={styles.tileIcon}>
+                <t.icon size={22} color={colors.brand[700]} />
+              </View>
+              <View style={styles.flex1}>
+                <Text style={styles.tileLabel}>{t.label}</Text>
+                <Text style={styles.tileHint}>{t.hint}</Text>
+              </View>
+              <ChevronRight size={18} color={colors.neutral.textMuted} />
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Task Detail / Quick Edit Modal */}
-      <TaskDetailModal
-        task={selectedTask}
-        visible={isDetailModalOpen}
-        onClose={handleCloseDetailModal}
-        projects={projects}
-        availableTasks={tasks}
-        onUpdateStatus={handleUpdateStatus}
-        onUpdateProgress={handleUpdateProgress}
-        onUpdateTask={handleUpdateTask}
-        onDeleteTask={deleteTask}
-        onTransferTask={transferTask}
-        onAddSubtask={handleAddSubtask}
-        onToggleSubtask={handleToggleSubtask}
-        onDeleteSubtask={handleDeleteSubtask}
-        onCapturePhoto={handleCapturePhoto}
-        onPickPhoto={handlePickPhoto}
-        onDeleteAttachment={handleDeleteAttachment}
-        testID="task-detail-modal"
-      />
+        <Text style={styles.sectionTitle}>Pedidos recentes</Text>
+        {orders === null ? (
+          <Text style={styles.muted}>Carregando...</Text>
+        ) : orders.length === 0 ? (
+          <Text style={styles.muted} testID="home-no-orders">Nenhum pedido ainda.</Text>
+        ) : (
+          orders.map((o) => {
+            const phase = PHASE_CONFIG[o.phase] || PHASE_CONFIG.DRAFT;
+            return (
+              <Card
+                key={o.id}
+                style={styles.orderCard}
+                onPress={() => router.push({ pathname: '/pedido-detalhe', params: { id: o.id } } as never)}
+                testID={`home-order-${o.id}`}
+              >
+                <View style={styles.flex1}>
+                  <Text style={styles.orderClient} numberOfLines={1}>{o.clientName || 'Cliente sem nome'}</Text>
+                  <Text style={styles.muted}>#{o.orderNumber || o.id.slice(0, 6)} · {formatMoney(o.totalAmount)}</Text>
+                </View>
+                <View style={[styles.badge, { backgroundColor: phase.bg, borderColor: phase.border }]}>
+                  <Text style={[styles.badgeText, { color: phase.text }]}>{phase.label}</Text>
+                </View>
+              </Card>
+            );
+          })
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.neutral.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.neutral.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral.border,
-  },
-  menuButton: { marginRight: spacing.sm, padding: spacing.xs },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flexShrink: 1,
-    marginRight: spacing.sm,
-  },
-  headerText: {
-    flexShrink: 1,
-  },
-  brandBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: radii.md,
-    backgroundColor: colors.brand[600],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerLogo: {
-    width: 110,
-    height: 33,
-  },
-  headerTitle: {
-    fontSize: typography.fontSizes.base,
-    fontWeight: typography.fontWeights.bold,
-    color: colors.neutral.textPrimary,
-  },
-  headerSubtitle: {
-    fontSize: typography.fontSizes.xs,
-    color: colors.neutral.textSecondary,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  headerActionButton: {
-    minHeight: minTouchTarget,
-    minWidth: minTouchTarget,
-    padding: spacing.xs,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: radii.sm,
-  },
-  headerAvatar: {
-    marginLeft: 2,
-    marginRight: 2,
-  },
-  syncIconButton: {
-    position: 'relative',
-    minHeight: minTouchTarget,
-    minWidth: minTouchTarget,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radii.sm,
-    backgroundColor: colors.brand[50],
-    borderWidth: 1,
-    borderColor: colors.brand[200],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  syncIconText: {
-    fontSize: typography.fontSizes.xs,
-    color: colors.brand[700],
-    fontWeight: typography.fontWeights.bold,
-  },
-  syncBadgeDot: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    width: 8,
-    height: 8,
-    borderRadius: radii.full,
-    backgroundColor: colors.brand[600],
-    borderWidth: 1,
-    borderColor: colors.neutral.surface,
-  },
-  syncBadgeDotPending: {
-    backgroundColor: '#0284c7',
-  },
-  syncBadgeDotError: {
-    backgroundColor: '#dc2626',
-  },
-  modulesIconButton: {
-    minHeight: minTouchTarget,
-    minWidth: minTouchTarget,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radii.sm,
-    backgroundColor: colors.brand[50],
-    borderWidth: 1,
-    borderColor: colors.brand[200],
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: spacing.xs,
-  },
-  modulesIconText: {
-    fontSize: typography.fontSizes.xs,
-    color: colors.brand[700],
-    fontWeight: typography.fontWeights.bold,
-  },
-  logoutIconButton: {
-    minHeight: minTouchTarget,
-    minWidth: minTouchTarget,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radii.sm,
-    backgroundColor: colors.neutral.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: colors.neutral.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoutIconText: {
-    fontSize: typography.fontSizes.xs,
-    color: colors.neutral.textSecondary,
-    fontWeight: typography.fontWeights.medium,
-  },
-  selectorWrapper: {
-    backgroundColor: colors.neutral.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral.border,
-    paddingVertical: 4,
-  },
-  toolbar: {
-    backgroundColor: colors.neutral.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    alignItems: 'flex-start',
-  },
-  listWrapper: {
-    flex: 1,
-  },
-  fabButton: {
-    position: 'absolute',
-    right: spacing.lg,
-    bottom: spacing.xl,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.brand[600],
-    paddingHorizontal: spacing.lg,
-    height: minTouchTarget + 6,
-    borderRadius: radii.md,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    gap: spacing.xs,
-  },
-  fabIcon: {
-    color: '#ffffff',
-    fontSize: typography.fontSizes.xl,
-    fontWeight: typography.fontWeights.bold,
-    lineHeight: 22,
-  },
-  fabText: {
-    color: '#ffffff',
-    fontSize: typography.fontSizes.sm,
-    fontWeight: typography.fontWeights.bold,
-  },
+  container: { flex: 1, backgroundColor: colors.neutral.background },
+  flex1: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg },
+  logo: { width: 36, height: 36 },
+  hello: { fontSize: typography.fontSizes.lg, fontWeight: typography.fontWeights.bold, color: colors.neutral.textPrimary },
+  sub: { fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary },
+  iconBtn: { minHeight: minTouchTarget, minWidth: minTouchTarget, alignItems: 'center', justifyContent: 'center' },
+  content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing['3xl'] },
+  summary: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, backgroundColor: colors.brand[600], borderRadius: radii.lg, padding: spacing.lg },
+  summaryNumber: { fontSize: 40, fontWeight: typography.fontWeights.bold, color: colors.neutral.white },
+  summaryTitle: { fontSize: typography.fontSizes.base, fontWeight: typography.fontWeights.semibold, color: colors.neutral.white },
+  summaryHint: { fontSize: typography.fontSizes.sm, color: colors.brand[100] },
+  tiles: { gap: spacing.sm },
+  tile: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 68, padding: spacing.md, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.neutral.border, backgroundColor: colors.neutral.surface },
+  tileIcon: { width: 44, height: 44, borderRadius: radii.md, backgroundColor: colors.brand[50], alignItems: 'center', justifyContent: 'center' },
+  tileLabel: { fontSize: typography.fontSizes.base, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textPrimary },
+  tileHint: { fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary },
+  sectionTitle: { marginTop: spacing.md, fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.bold, color: colors.neutral.textSecondary, textTransform: 'uppercase' },
+  muted: { fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary },
+  orderCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md },
+  orderClient: { fontSize: typography.fontSizes.base, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textPrimary },
+  badge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radii.pill, borderWidth: 1 },
+  badgeText: { fontSize: typography.fontSizes.xs, fontWeight: typography.fontWeights.semibold },
 });

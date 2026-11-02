@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography } from '@/core/theme';
@@ -12,17 +12,20 @@ import { ModuleGrid, ModuleEntry } from '@/components/modules/ModuleGrid';
  */
 export default function ModulesScreen() {
   const router = useRouter();
+  const [showMore, setShowMore] = useState(false);
 
-  const modules: ModuleEntry[] = [
-    { route: '/', label: 'Dashboard', shortLabel: 'DB', description: 'Tarefas e painel do operador' },
-    { route: '/', label: 'Quadro / Kanban', shortLabel: 'QB', description: 'Colunas e cards por status' },
-    { route: '/pedidos', label: 'Pedidos', shortLabel: 'PD', description: 'Consulta e criação de pedidos' },
-    { route: '/entregas', label: 'Entregas', shortLabel: 'EN', description: 'Estado e confirmação de entregas' },
+  const main: ModuleEntry[] = [
+    { route: '/pedidos', label: 'Pedidos', shortLabel: 'PD', description: 'Fazer pedidos e acompanhar o status' },
+    { route: '/agenda', label: 'Visitas', shortLabel: 'VS', description: 'Agenda e conclusão de visitas com localização' },
     { route: '/clientes', label: 'Clientes', shortLabel: 'CL', description: 'Lista e detalhe de clientes' },
+  ];
+
+  const more: ModuleEntry[] = [
+    { route: '/tarefas', label: 'Quadro / Kanban', shortLabel: 'QB', description: 'Colunas e cards por status' },
+    { route: '/entregas', label: 'Entregas', shortLabel: 'EN', description: 'Estado e confirmação de entregas' },
     { route: '/estoque', label: 'Estoque', shortLabel: 'ES', description: 'Disponibilidade de produtos' },
     { route: '/atividades', label: 'Atividades', shortLabel: 'AT', description: 'Concluir atividades de campo' },
     { route: '/sync-status', label: 'Sincronização', shortLabel: 'SY', description: 'Estado da rede e fila Outbox' },
-    { route: '/agenda', label: 'Agenda', shortLabel: 'AG', description: 'Visitas e reuniões' },
     { route: '/carteira', label: 'Carteira', shortLabel: 'CA', description: 'Clientes por região da vendedora' },
     { route: '/pesquisas', label: 'Pesquisa de Campo', shortLabel: 'PC', description: 'Questionário de pós-larvas em campo' },
     { route: '/checkin', label: 'Check-in GPS', shortLabel: 'CK', description: 'Marcar presença nas fazendas' },
@@ -57,22 +60,44 @@ export default function ModulesScreen() {
 
       <View style={styles.subheader}>
         <Text style={styles.subtitle}>
-          Todos os módulos da LarviFort. Os disponíveis abrem a tela.
+          O que você mais usa no dia a dia.
         </Text>
       </View>
 
       <ModuleGrid
-        modules={modules}
+        modules={main}
         onNavigate={(route) =>
           router.push(route as Parameters<typeof router.push>[0])
         }
         testID="modules-grid"
       />
+
+      <TouchableOpacity
+        testID="modules-more-toggle"
+        accessibilityRole="button"
+        accessibilityLabel="Mais módulos"
+        style={styles.moreToggle}
+        onPress={() => setShowMore((v) => !v)}
+      >
+        <Text style={styles.moreText}>{showMore ? 'Ocultar' : 'Mais'}</Text>
+      </TouchableOpacity>
+      {showMore && (
+        <ScrollView style={styles.moreList}>
+          <ModuleGrid
+            modules={more}
+            onNavigate={(route) => router.push(route as Parameters<typeof router.push>[0])}
+            testID="modules-more-grid"
+          />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  moreToggle: { minHeight: 44, justifyContent: 'center', alignItems: 'center', marginTop: spacing.md },
+  moreText: { fontSize: typography.fontSizes.sm, color: colors.neutral.textMuted },
+  moreList: { flex: 1, marginTop: spacing.sm },
   container: {
     flex: 1,
     backgroundColor: colors.neutral.background,

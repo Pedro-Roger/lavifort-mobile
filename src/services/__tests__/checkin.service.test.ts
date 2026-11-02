@@ -165,7 +165,8 @@ describe('checkinService — sync de pendências', () => {
     expect(apiClient.patch).toHaveBeenCalledWith('/appointments/appt-9/checkin', {
       latitude: -4.3,
       longitude: -37.9,
-      accuracy: 15,
+      accuracyMeters: 15,
+      clientTimestamp: '2026-01-01T00:00:00.000Z',
     });
     expect(result).toEqual({ synced: 1, local: 1, failed: 0 });
     expect(localStorage.setItem).toHaveBeenCalledWith(

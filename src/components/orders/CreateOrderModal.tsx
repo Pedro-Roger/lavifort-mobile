@@ -10,10 +10,25 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { colors, spacing, radii, typography, minTouchTarget } from '@/core/theme';
-import { Order, OrderStatus, OrderPhase, CreateOrderInput, Cliente } from '@/types';
+import { Order, CreateOrderInput, Cliente } from '@/types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { formatMoney } from './orderMeta';
+import { formatBRL } from '@/utils/format';
+import {
+  OrderDraft,
+  DraftItem,
+  PAYMENT_METHODS,
+  UNITS,
+  STEP_TITLES,
+  emptyDraft,
+  emptyItem,
+  maskDate,
+  maskTime,
+  orderTotal,
+  clientAddress,
+  validateStep,
+  buildOrderInput,
+} from './orderForm';
 
 export interface CreateOrderModalProps {
   visible: boolean;
@@ -23,17 +38,9 @@ export interface CreateOrderModalProps {
   testID?: string;
 }
 
-interface DraftItem {
-  productName: string;
-  quantity: string;
-  unitPrice: string;
-}
+const LAST_STEP = STEP_TITLES.length - 1;
 
-const STATUS_LIST: { id: OrderStatus; label: string }[] = [
-  { id: 'ORCAMENTO', label: 'Orçamento' },
-  { id: 'PEDIDO', label: 'Pedido' },
-];
-
+/** Pedido em 4 passos curtos: Cliente → Produtos → Entrega → Pagamento. */
 export function CreateOrderModal({
   visible,
   onClose,
@@ -41,45 +48,37 @@ export function CreateOrderModal({
   onCreateOrder,
   testID = 'create-order-modal',
 }: CreateOrderModalProps) {
+  const [step, setStep] = useState(0);
+  const [draft, setDraft] = useState<OrderDraft>(emptyDraft());
   const [clientQuery, setClientQuery] = useState('');
   const [candidates, setCandidates] = useState<Cliente[]>([]);
-  const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
-  const [status, setStatus] = useState<OrderStatus>('PEDIDO');
-  const [phase, setPhase] = useState<OrderPhase>('ABERTO');
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [notes, setNotes] = useState('');
-  const [items, setItems] = useState<DraftItem[]>([{ productName: '', quantity: '1', unitPrice: '' }]);
+  const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (visible) {
+      setStep(0);
+      setDraft(emptyDraft());
       setClientQuery('');
       setCandidates([]);
-      setSelectedClient(null);
-      setStatus('PEDIDO');
-      setPhase('ABERTO');
-      setDeliveryDate('');
-      setNotes('');
-      setItems([{ productName: '', quantity: '1', unitPrice: '' }]);
       setError(null);
       setIsSubmitting(false);
       setIsSearching(false);
     }
   }, [visible]);
 
+  const patch = (p: Partial<OrderDraft>) => setDraft((d) => ({ ...d, ...p }));
+
   const handleSearch = async (query: string) => {
     setClientQuery(query);
     if (query.trim().length < 2) {
       setCandidates([]);
-      setIsSearching(false);
       return;
     }
     setIsSearching(true);
     try {
-      const found = await onSearchClients(query.trim());
-      setCandidates(found);
+      setCandidates(await onSearchClients(query.trim()));
     } catch {
       setCandidates([]);
     } finally {
@@ -87,69 +86,83 @@ export function CreateOrderModal({
     }
   };
 
-  const handleSelectClient = (client: Cliente) => {
-    setSelectedClient(client);
+  const selectClient = (client: Cliente) => {
+    // Endereço do cadastro pré-preenche a entrega (editável no passo 3).
+    patch({ client, endereco: clientAddress(client) });
     setCandidates([]);
-    setClientQuery(`${client.firstName} ${client.lastName}`.trim());
+    setClientQuery('');
+    setError(null);
   };
 
-  const updateItem = (index: number, field: keyof DraftItem, value: string) => {
-    const next = items.map((item, i) => (i === index ? { ...item, [field]: value } : item));
-    setItems(next);
+  const updateItem = (index: number, field: keyof DraftItem, value: string) =>
+    setDraft((d) => ({
+      ...d,
+      items: d.items.map((it, i) => (i === index ? { ...it, [field]: value } : it)),
+    }));
+
+  const removeItem = (index: number) =>
+    setDraft((d) => ({
+      ...d,
+      items: d.items.length === 1 ? d.items : d.items.filter((_, i) => i !== index),
+    }));
+
+  const goNext = () => {
+    const msg = validateStep(step, draft);
+    setError(msg);
+    if (!msg) setStep((s) => s + 1);
   };
 
-  const removeItem = (index: number) => {
-    if (items.length === 1) return;
-    setItems(items.filter((_, i) => i !== index));
+  const goBack = () => {
+    setError(null);
+    setStep((s) => Math.max(0, s - 1));
   };
-
-  const addItem = () => {
-    setItems([...items, { productName: '', quantity: '1', unitPrice: '' }]);
-  };
-
-  const computeSubtotal = () =>
-    items.reduce((acc, item) => {
-      const qty = Number(item.quantity) || 0;
-      const price = Number(item.unitPrice) || 0;
-      return acc + qty * price;
-    }, 0);
 
   const handleSubmit = async () => {
-    if (!selectedClient) {
-      setError('Selecione um cliente para o pedido');
-      return;
+    for (let s = 0; s <= LAST_STEP; s++) {
+      const msg = validateStep(s, draft);
+      if (msg) {
+        setStep(s);
+        setError(msg);
+        return;
+      }
     }
-    const validItems = items.filter((item) => item.productName.trim().length > 0);
-    if (validItems.length === 0) {
-      setError('Adicione ao menos um item com nome do produto');
-      return;
-    }
-
     setError(null);
     setIsSubmitting(true);
     try {
-      const created = await onCreateOrder({
-        clientId: selectedClient.id,
-        status,
-        phase,
-        deliveryDate: deliveryDate.trim() || null,
-        notes: notes.trim() || null,
-        items: validItems.map((item) => ({
-          productName: item.productName.trim(),
-          unit: 'und',
-          quantity: Number(item.quantity) || 0,
-          unitPrice: Number(item.unitPrice) || 0,
-        })),
-      });
+      const created = await onCreateOrder(buildOrderInput(draft));
       if (created) onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar o pedido');
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      setError(
+        status === undefined
+          ? 'Sem conexão. Conecte-se à internet para salvar o pedido.'
+          : err instanceof Error
+            ? err.message
+            : 'Erro ao criar o pedido',
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const subtotal = computeSubtotal();
+  const chip = (label: string, selected: boolean, onPress: () => void, id: string) => (
+    <TouchableOpacity
+      key={label}
+      testID={id}
+      style={[styles.pill, selected && styles.pillSelected]}
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+    >
+      <Text style={[styles.pillText, selected && styles.pillTextSelected]}>{label}</Text>
+    </TouchableOpacity>
+  );
+
+  const clientName = draft.client
+    ? `${draft.client.firstName} ${draft.client.lastName}`.trim()
+    : '';
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} testID={testID}>
@@ -159,12 +172,20 @@ export function CreateOrderModal({
         <View style={styles.sheetContainer} testID="create-order-sheet">
           <View style={styles.sheetHeader}>
             <View>
-              <Text style={styles.sheetTitle}>Novo Pedido</Text>
-              <Text style={styles.sheetSubtitle}>Novo pedido sincronizado com a API</Text>
+              <Text style={styles.sheetTitle}>Novo pedido</Text>
+              <Text style={styles.sheetSubtitle}>
+                Passo {step + 1} de {STEP_TITLES.length} · {STEP_TITLES[step]}
+              </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton} testID="create-order-close-button" accessibilityRole="button" accessibilityLabel="Fechar modal">
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
+          </View>
+
+          <View style={styles.progressRow} testID="create-order-progress">
+            {STEP_TITLES.map((t, i) => (
+              <View key={t} style={[styles.progressBar, i <= step && styles.progressBarOn]} />
+            ))}
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
@@ -174,160 +195,211 @@ export function CreateOrderModal({
               </View>
             )}
 
-            {/* Cliente */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionLabel}>Cliente *</Text>
-              {selectedClient ? (
-                <View style={styles.selectedClientRow} testID="create-order-selected-client">
-                  <Text style={styles.selectedClientText}>
-                    {selectedClient.firstName} {selectedClient.lastName}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSelectedClient(null);
-                      setClientQuery('');
-                    }}
-                    style={styles.selectedClientClear}
-                    accessibilityRole="button"
-                    accessibilityLabel="Trocar cliente"
-                    testID="create-order-clear-client"
-                  >
-                    <Text style={styles.selectedClientClearText}>Trocar</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View>
-                  <Input
-                    placeholder="Buscar cliente por nome ou CPF..."
-                    value={clientQuery}
-                    onChangeText={handleSearch}
-                    testID="create-order-client-search"
-                  />
-                  {isSearching && <Text style={styles.searchingText}>Buscando...</Text>}
-                </View>
-              )}
-
-              {!selectedClient && candidates.length > 0 && (
-                <View style={styles.candidateList} testID="create-order-candidates">
-                  {candidates.map((c) => (
-                    <TouchableOpacity
-                      key={c.id}
-                      style={styles.candidateRow}
-                      onPress={() => handleSelectClient(c)}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Selecionar ${c.firstName} ${c.lastName}`}
-                      testID={`create-order-client-${c.id}`}
-                    >
-                      <Text style={styles.candidateText} numberOfLines={1}>
-                        {c.firstName} {c.lastName}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-
-            {/* Status */}
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionLabel}>Tipo</Text>
-              <View style={styles.pillsRow}>
-                {STATUS_LIST.map((s) => {
-                  const isSelected = status === s.id;
-                  return (
-                    <TouchableOpacity
-                      key={s.id}
-                      testID={`create-order-status-${s.id}`}
-                      style={[styles.pill, isSelected && styles.pillSelected]}
-                      onPress={() => setStatus(s.id)}
-                      activeOpacity={0.7}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Selecionar ${s.label}`}
-                      accessibilityState={{ selected: isSelected }}
-                    >
-                      <Text style={[styles.pillText, isSelected && styles.pillTextSelected]}>{s.label}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-
-            {/* Items */}
-            <View style={styles.sectionContainer} testID="create-order-items">
-              <Text style={styles.sectionLabel}>Items</Text>
-              {items.map((item, index) => (
-                <View key={index} style={styles.itemCard} testID={`create-order-item-${index}`}>
-                  <Text style={styles.itemIndex}>Item {index + 1}</Text>
-                  <Input
-                    placeholder="Nome do produto *"
-                    value={item.productName}
-                    onChangeText={(text) => updateItem(index, 'productName', text)}
-                    testID={`create-order-item-${index}-name`}
-                  />
-                  <View style={styles.itemNumberRow}>
-                    <View style={styles.itemNumberField}>
-                      <Input
-                        label="Quantidade"
-                        keyboardType="number-pad"
-                        value={item.quantity}
-                        onChangeText={(text) => updateItem(index, 'quantity', text)}
-                        testID={`create-order-item-${index}-qty`}
-                      />
+            {step === 0 && (
+              <View style={styles.section} testID="create-order-step-client">
+                <Text style={styles.sectionLabel}>Cliente *</Text>
+                {draft.client ? (
+                  <View style={styles.selectedClientRow} testID="create-order-selected-client">
+                    <View style={styles.flex1}>
+                      <Text style={styles.selectedClientText}>{clientName}</Text>
+                      {clientAddress(draft.client) ? (
+                        <Text style={styles.muted} numberOfLines={2}>
+                          {clientAddress(draft.client)}
+                        </Text>
+                      ) : null}
                     </View>
-                    <View style={styles.itemNumberField}>
-                      <Input
-                        label="Preço unit."
-                        keyboardType="decimal-pad"
-                        value={item.unitPrice}
-                        onChangeText={(text) => updateItem(index, 'unitPrice', text)}
-                        testID={`create-order-item-${index}-price`}
-                      />
-                    </View>
+                    <TouchableOpacity
+                      onPress={() => patch({ client: null, endereco: '' })}
+                      style={styles.linkButton}
+                      accessibilityRole="button"
+                      accessibilityLabel="Trocar cliente"
+                      testID="create-order-clear-client"
+                    >
+                      <Text style={styles.linkText}>Trocar</Text>
+                    </TouchableOpacity>
                   </View>
-                  {items.length > 1 && (
-                    <TouchableOpacity
-                      onPress={() => removeItem(index)}
-                      style={styles.removeItem}
-                      accessibilityRole="button"
-                      testID={`create-order-item-${index}-remove`}
-                    >
-                      <Text style={styles.removeItemText}>Remover item</Text>
-                    </TouchableOpacity>
+                ) : (
+                  <View>
+                    <Input
+                      placeholder="Buscar cliente por nome ou CPF/CNPJ..."
+                      value={clientQuery}
+                      onChangeText={handleSearch}
+                      testID="create-order-client-search"
+                    />
+                    {isSearching && <Text style={styles.muted}>Buscando...</Text>}
+                  </View>
+                )}
+                {!draft.client && candidates.length > 0 && (
+                  <View style={styles.candidateList} testID="create-order-candidates">
+                    {candidates.map((c) => (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={styles.candidateRow}
+                        onPress={() => selectClient(c)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Selecionar ${c.firstName} ${c.lastName}`}
+                        testID={`create-order-client-${c.id}`}
+                      >
+                        <Text style={styles.candidateText} numberOfLines={1}>
+                          {c.firstName} {c.lastName}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {step === 1 && (
+              <View style={styles.section} testID="create-order-items">
+                {draft.items.map((item, index) => (
+                  <View key={index} style={styles.itemCard} testID={`create-order-item-${index}`}>
+                    <Text style={styles.itemIndex}>Produto {index + 1}</Text>
+                    <Input
+                      label="Nome do produto"
+                      placeholder="Ex.: Pós-larva PL12"
+                      value={item.productName}
+                      onChangeText={(v) => updateItem(index, 'productName', v)}
+                      testID={`create-order-item-${index}-name`}
+                    />
+                    <View style={styles.row}>
+                      <View style={styles.flex1}>
+                        <Input
+                          label="Quantidade"
+                          keyboardType="decimal-pad"
+                          value={item.quantity}
+                          onChangeText={(v) => updateItem(index, 'quantity', v)}
+                          testID={`create-order-item-${index}-qty`}
+                        />
+                      </View>
+                      <View style={styles.flex1}>
+                        <Input
+                          label="Valor unit. (R$)"
+                          keyboardType="decimal-pad"
+                          placeholder="0,00"
+                          value={item.unitPrice}
+                          onChangeText={(v) => updateItem(index, 'unitPrice', v)}
+                          testID={`create-order-item-${index}-price`}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.pillsRow}>
+                      {UNITS.map((u) =>
+                        chip(u, item.unit === u, () => updateItem(index, 'unit', u), `create-order-item-${index}-unit-${u}`),
+                      )}
+                    </View>
+                    {draft.items.length > 1 && (
+                      <TouchableOpacity onPress={() => removeItem(index)} accessibilityRole="button" accessibilityLabel="Remover produto" testID={`create-order-item-${index}-remove`}>
+                        <Text style={styles.removeText}>Remover produto</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+                <Button
+                  title="+ Adicionar produto"
+                  variant="outline"
+                  size="sm"
+                  onPress={() => setDraft((d) => ({ ...d, items: [...d.items, emptyItem()] }))}
+                  testID="create-order-add-item"
+                />
+                <Text style={styles.total} testID="create-order-subtotal">
+                  Total: {formatBRL(orderTotal(draft))}
+                </Text>
+              </View>
+            )}
+
+            {step === 2 && (
+              <View style={styles.section} testID="create-order-step-delivery">
+                <View style={styles.row}>
+                  <View style={styles.flex1}>
+                    <Input
+                      label="Data de entrega *"
+                      placeholder="dd/mm/aaaa"
+                      keyboardType="number-pad"
+                      value={draft.deliveryDate}
+                      onChangeText={(v) => patch({ deliveryDate: maskDate(v) })}
+                      testID="create-order-delivery-date"
+                    />
+                  </View>
+                  <View style={styles.flex1}>
+                    <Input
+                      label="Hora"
+                      placeholder="HH:mm"
+                      keyboardType="number-pad"
+                      value={draft.horaEntrega}
+                      onChangeText={(v) => patch({ horaEntrega: maskTime(v) })}
+                      testID="create-order-delivery-time"
+                    />
+                  </View>
+                </View>
+                <Input
+                  label="Local de entrega"
+                  placeholder="Fazenda ou ponto de entrega"
+                  value={draft.localEntrega}
+                  onChangeText={(v) => patch({ localEntrega: v })}
+                  testID="create-order-delivery-place"
+                />
+                <Input
+                  label="Endereço de entrega *"
+                  placeholder="Rua, número, cidade/UF"
+                  value={draft.endereco}
+                  onChangeText={(v) => patch({ endereco: v })}
+                  multiline
+                  helperText="Obrigatório para fechar o pedido."
+                  testID="create-order-delivery-address"
+                />
+              </View>
+            )}
+
+            {step === 3 && (
+              <View style={styles.section} testID="create-order-step-payment">
+                <Text style={styles.sectionLabel}>Forma de pagamento *</Text>
+                <View style={styles.pillsRow}>
+                  {PAYMENT_METHODS.map((m) =>
+                    chip(m, draft.paymentMethod === m, () => patch({ paymentMethod: m }), `create-order-payment-${m}`),
                   )}
                 </View>
-              ))}
-              <TouchableOpacity onPress={addItem} style={styles.addItem} accessibilityRole="button" testID="create-order-add-item">
-                <Text style={styles.addItemText}>+ Adicionar item</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Totales parciales */}
-            <View style={styles.subtotalRow}>
-              <Text style={styles.subtotalLabel}>Subtotal</Text>
-              <Text style={styles.subtotalValue}>{formatMoney(subtotal)}</Text>
-            </View>
-
-            {/* Datos opcionales */}
-            <Input
-              label="Data de entrega"
-              placeholder="Ex: 2026-10-15"
-              value={deliveryDate}
-              onChangeText={setDeliveryDate}
-              testID="create-order-delivery-date"
-            />
-            <Input
-              label="Notas"
-              placeholder="Instruções ou observações..."
-              value={notes}
-              onChangeText={setNotes}
-              multiline
-              numberOfLines={3}
-              testID="create-order-notes"
-            />
+                <Input
+                  label="Observação"
+                  placeholder="Opcional"
+                  value={draft.notes}
+                  onChangeText={(v) => patch({ notes: v })}
+                  multiline
+                  testID="create-order-notes"
+                />
+                <View style={styles.summary} testID="create-order-summary">
+                  <Text style={styles.summaryTitle}>Resumo</Text>
+                  <Text style={styles.summaryLine}>{clientName}</Text>
+                  <Text style={styles.summaryLine}>
+                    {draft.items.filter((i) => i.productName.trim()).length} produto(s) · {formatBRL(orderTotal(draft))}
+                  </Text>
+                  <Text style={styles.summaryLine}>
+                    Entrega {draft.deliveryDate}
+                    {draft.horaEntrega ? ` às ${draft.horaEntrega}` : ''}
+                  </Text>
+                </View>
+              </View>
+            )}
           </ScrollView>
 
-          <View style={styles.actionsFooter}>
-            <Button title="Cancelar" variant="outline" size="md" onPress={onClose} disabled={isSubmitting} style={styles.actionButton} testID="create-order-cancel-button" />
-            <Button title="Criar Pedido" variant="primary" size="md" onPress={handleSubmit} isLoading={isSubmitting} style={styles.actionButton} testID="create-order-submit-button" />
+          <View style={styles.footer}>
+            {step > 0 ? (
+              <Button title="Voltar" variant="outline" onPress={goBack} style={styles.flex1} testID="create-order-back" />
+            ) : (
+              <Button title="Cancelar" variant="outline" onPress={onClose} style={styles.flex1} testID="create-order-cancel" />
+            )}
+            {step < LAST_STEP ? (
+              <Button title="Continuar" onPress={goNext} style={styles.flex1} testID="create-order-next" />
+            ) : (
+              <Button
+                title="Salvar pedido"
+                onPress={handleSubmit}
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+                style={styles.flex1}
+                testID="create-order-submit"
+              />
+            )}
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -336,129 +408,66 @@ export function CreateOrderModal({
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.6)', justifyContent: 'flex-end' },
+  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(15,23,42,0.45)' },
   backdropDismiss: { flex: 1 },
   sheetContainer: {
-    backgroundColor: colors.neutral.surface,
-    borderTopLeftRadius: radii.md,
-    borderTopRightRadius: radii.md,
     maxHeight: '92%',
-    paddingBottom: Platform.OS === 'ios' ? spacing.xl : spacing.md,
+    backgroundColor: colors.neutral.surface,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    padding: spacing.lg,
   },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.neutral.border,
-  },
-  sheetTitle: { fontSize: typography.fontSizes.lg, fontWeight: typography.fontWeights.bold, color: colors.neutral.textPrimary },
-  sheetSubtitle: { fontSize: typography.fontSizes.xs, color: colors.neutral.textSecondary, marginTop: 2 },
-  closeButton: {
-    width: minTouchTarget,
-    height: minTouchTarget,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: radii.full,
-    backgroundColor: colors.neutral.surfaceSubtle,
-  },
-  closeButtonText: { fontSize: typography.fontSizes.base, color: colors.neutral.textSecondary, fontWeight: typography.fontWeights.bold },
-  scrollContent: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md, gap: spacing.xs },
-  errorBanner: {
-    backgroundColor: '#fef2f2',
-    borderColor: '#fecaca',
-    borderWidth: 1,
-    borderRadius: radii.md,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  errorBannerText: { color: '#b91c1c', fontSize: typography.fontSizes.xs, fontWeight: typography.fontWeights.medium },
-  sectionContainer: { marginVertical: spacing.xs },
-  sectionLabel: {
-    fontSize: typography.fontSizes.xs,
-    fontWeight: typography.fontWeights.semibold,
-    color: colors.neutral.textSecondary,
-    marginBottom: spacing.xs,
-    textTransform: 'uppercase',
-  },
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.sm },
+  sheetTitle: { fontSize: typography.fontSizes.xl, fontWeight: typography.fontWeights.bold, color: colors.neutral.textPrimary },
+  sheetSubtitle: { marginTop: 2, fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary },
+  closeButton: { minHeight: minTouchTarget, minWidth: minTouchTarget, alignItems: 'center', justifyContent: 'center' },
+  closeButtonText: { fontSize: typography.fontSizes.lg, color: colors.neutral.textSecondary },
+  progressRow: { flexDirection: 'row', gap: spacing.xs, marginBottom: spacing.md },
+  progressBar: { flex: 1, height: 4, borderRadius: radii.sm, backgroundColor: colors.neutral.border },
+  progressBarOn: { backgroundColor: colors.brand[600] },
+  scrollContent: { paddingBottom: spacing.lg, gap: spacing.md },
+  errorBanner: { backgroundColor: '#fee2e2', borderRadius: radii.md, padding: spacing.md },
+  errorBannerText: { color: '#b91c1c', fontSize: typography.fontSizes.sm },
+  section: { gap: spacing.md },
+  sectionLabel: { fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textPrimary },
+  muted: { fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary },
+  flex1: { flex: 1 },
+  row: { flexDirection: 'row', gap: spacing.md },
   selectedClientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.sm,
+    gap: spacing.md,
+    padding: spacing.md,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.neutral.border,
-    backgroundColor: colors.neutral.surfaceSubtle,
-  },
-  selectedClientText: { flex: 1, fontSize: typography.fontSizes.base, color: colors.neutral.textPrimary },
-  selectedClientClear: { minHeight: minTouchTarget, justifyContent: 'center', paddingHorizontal: spacing.sm },
-  selectedClientClearText: { fontSize: typography.fontSizes.xs, color: colors.brand[700], fontWeight: typography.fontWeights.semibold },
-  searchingText: { fontSize: typography.fontSizes.xs, color: colors.neutral.textMuted, marginTop: 4 },
-  candidateList: { marginTop: spacing.xs },
-  candidateRow: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    borderRadius: radii.sm,
-    backgroundColor: colors.neutral.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: colors.neutral.border,
-    minHeight: minTouchTarget,
-    marginBottom: spacing.xs,
-  },
-  candidateText: { fontSize: typography.fontSizes.sm, color: colors.neutral.textPrimary },
-  pillsRow: { flexDirection: 'row', gap: spacing.xs, flexWrap: 'wrap' },
-  pill: {
-    minHeight: 40,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 6,
-    borderRadius: radii.lg,
-    backgroundColor: colors.neutral.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: colors.neutral.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pillSelected: { backgroundColor: colors.brand[50], borderColor: colors.brand[600] },
-  pillText: { fontSize: typography.fontSizes.xs, color: colors.neutral.textSecondary, fontWeight: typography.fontWeights.medium },
-  pillTextSelected: { color: colors.brand[700], fontWeight: typography.fontWeights.bold },
-  itemCard: {
-    borderWidth: 1,
-    borderColor: colors.neutral.border,
-    borderRadius: radii.md,
-    padding: spacing.sm,
-    backgroundColor: colors.neutral.surface,
-    marginBottom: spacing.sm,
-  },
-  itemIndex: { fontSize: typography.fontSizes.xs, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textMuted, marginBottom: spacing.xs },
-  itemNumberRow: { flexDirection: 'row', gap: spacing.sm },
-  itemNumberField: { flex: 1 },
-  removeItem: { minHeight: minTouchTarget, justifyContent: 'center', alignItems: 'center', marginTop: spacing.xs },
-  removeItemText: { fontSize: typography.fontSizes.xs, color: '#dc2626', fontWeight: typography.fontWeights.medium },
-  addItem: {
-    minHeight: minTouchTarget,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderStyle: 'dashed',
     borderColor: colors.brand[300],
-    borderRadius: radii.md,
-    backgroundColor: colors.neutral.surfaceSubtle,
+    backgroundColor: colors.brand[50],
   },
-  addItemText: { fontSize: typography.fontSizes.sm, color: colors.brand[700], fontWeight: typography.fontWeights.semibold },
-  subtotalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.xs },
-  subtotalLabel: { fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.medium, color: colors.neutral.textSecondary },
-  subtotalValue: { fontSize: typography.fontSizes.sm, fontWeight: typography.fontWeights.bold, color: colors.neutral.textPrimary },
-  actionsFooter: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.neutral.border,
-    gap: spacing.sm,
+  selectedClientText: { fontSize: typography.fontSizes.base, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textPrimary },
+  linkButton: { minHeight: minTouchTarget, justifyContent: 'center', paddingHorizontal: spacing.sm },
+  linkText: { color: colors.brand[700], fontWeight: typography.fontWeights.semibold, fontSize: typography.fontSizes.sm },
+  candidateList: { borderWidth: 1, borderColor: colors.neutral.border, borderRadius: radii.md, overflow: 'hidden' },
+  candidateRow: { minHeight: minTouchTarget, justifyContent: 'center', paddingHorizontal: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.neutral.borderSubtle },
+  candidateText: { fontSize: typography.fontSizes.base, color: colors.neutral.textPrimary },
+  itemCard: { gap: spacing.sm, padding: spacing.md, borderRadius: radii.md, borderWidth: 1, borderColor: colors.neutral.border, backgroundColor: colors.neutral.surfaceSubtle },
+  itemIndex: { fontSize: typography.fontSizes.xs, fontWeight: typography.fontWeights.semibold, color: colors.neutral.textMuted, textTransform: 'uppercase' },
+  removeText: { color: '#b91c1c', fontSize: typography.fontSizes.sm, paddingVertical: spacing.xs },
+  pillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  pill: {
+    minHeight: minTouchTarget,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.neutral.border,
+    backgroundColor: colors.neutral.surface,
   },
-  actionButton: { flex: 1 },
+  pillSelected: { backgroundColor: colors.brand[600], borderColor: colors.brand[600] },
+  pillText: { fontSize: typography.fontSizes.sm, color: colors.neutral.textSecondary, fontWeight: typography.fontWeights.medium },
+  pillTextSelected: { color: colors.neutral.white, fontWeight: typography.fontWeights.semibold },
+  total: { textAlign: 'right', fontSize: typography.fontSizes.lg, fontWeight: typography.fontWeights.bold, color: colors.neutral.textPrimary },
+  summary: { padding: spacing.md, borderRadius: radii.md, backgroundColor: colors.brand[50], gap: 2 },
+  summaryTitle: { fontSize: typography.fontSizes.xs, fontWeight: typography.fontWeights.bold, color: colors.brand[700], textTransform: 'uppercase' },
+  summaryLine: { fontSize: typography.fontSizes.sm, color: colors.neutral.textPrimary },
+  footer: { flexDirection: 'row', gap: spacing.md, paddingTop: spacing.md },
 });

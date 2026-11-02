@@ -19,7 +19,9 @@
       "title": "Implementação do Core Storage, SecureStore e Cliente HTTP de API",
       "priority": 2,
       "status": "completed",
-      "dependsOn": ["MOB-001"],
+      "dependsOn": [
+        "MOB-001"
+      ],
       "acceptanceCriteria": [
         "Cliente HTTP configurado com base URL da lavifort-API e interceptor de Bearer token",
         "Abstração segura de tokens com expo-secure-store",
@@ -31,7 +33,9 @@
       "title": "Módulo de Autenticação com Cache de Sessão Offline",
       "priority": 3,
       "status": "completed",
-      "dependsOn": ["MOB-002"],
+      "dependsOn": [
+        "MOB-002"
+      ],
       "acceptanceCriteria": [
         "Tela de login consumindo /auth/login e persistindo token",
         "Permite acesso às telas principais em modo offline com sessão salva anteriormente",
@@ -43,7 +47,9 @@
       "title": "Banco de Dados Local e Fila Outbox para Mutações",
       "priority": 4,
       "status": "completed",
-      "dependsOn": ["MOB-002"],
+      "dependsOn": [
+        "MOB-002"
+      ],
       "acceptanceCriteria": [
         "Repositório local para armazenamento de tarefas e projetos",
         "Estrutura da fila OutboxQueue para registrar mutações (CREATE, UPDATE, UPDATE_STATUS, DELETE)",
@@ -55,7 +61,9 @@
       "title": "Motor de Sincronização (Sync Engine) e Monitor de Conexão",
       "priority": 5,
       "status": "completed",
-      "dependsOn": ["MOB-004"],
+      "dependsOn": [
+        "MOB-004"
+      ],
       "acceptanceCriteria": [
         "NetInfo detecta transições entre offline e online",
         "Sync Engine processa mutações da Outbox em ordem cronológica (FIFO)",
@@ -68,7 +76,9 @@
       "title": "Componentes Base do Design System e Banner de Offline",
       "priority": 6,
       "status": "completed",
-      "dependsOn": ["MOB-001"],
+      "dependsOn": [
+        "MOB-001"
+      ],
       "acceptanceCriteria": [
         "Componentes reutilizáveis: Button, Badge, Input, Card, Avatar, Slider",
         "Banner de status de conexão e sincronização no topo (Offline / Sincronizando / Sincronizado)",
@@ -80,7 +90,10 @@
       "title": "Seletor de Projetos/Setores e Listagem de Tarefas",
       "priority": 7,
       "status": "completed",
-      "dependsOn": ["MOB-005", "MOB-006"],
+      "dependsOn": [
+        "MOB-005",
+        "MOB-006"
+      ],
       "acceptanceCriteria": [
         "Seletor de setores (Comercial, Operações, Financeiro, Desenvolvimento, etc.)",
         "Carregamento de tarefas a partir do banco local",
@@ -92,7 +105,9 @@
       "title": "Quadro Kanban Adaptado para Mobile (Tabs / Swipeable)",
       "priority": 8,
       "status": "completed",
-      "dependsOn": ["MOB-007"],
+      "dependsOn": [
+        "MOB-007"
+      ],
       "acceptanceCriteria": [
         "Visualização em colunas navegáveis (Backlog, Em Andamento, Em Revisão, Concluído)",
         "Contadores de cards por coluna e badges de status idênticos ao larvifort-crm",
@@ -104,7 +119,9 @@
       "title": "Criação Rápida e Edição de Tarefas Offline",
       "priority": 9,
       "status": "completed",
-      "dependsOn": ["MOB-008"],
+      "dependsOn": [
+        "MOB-008"
+      ],
       "acceptanceCriteria": [
         "Modal/Sheet de criação rápida de tarefas com UUID v4 local",
         "Alteração de status com 1 toque e slider de progresso (0-100%)",
@@ -116,7 +133,9 @@
       "title": "Transferência de Tarefas e Subtarefas",
       "priority": 10,
       "status": "completed",
-      "dependsOn": ["MOB-009"],
+      "dependsOn": [
+        "MOB-009"
+      ],
       "acceptanceCriteria": [
         "Fluxo para mover tarefa para outro setor ou converter em subtarefa (/tasks/:id/transfer)",
         "Enfileiramento na Outbox em caso de ausência de rede"
@@ -127,7 +146,9 @@
       "title": "Anexos e Fotos de Evidência de Campo",
       "priority": 11,
       "status": "completed",
-      "dependsOn": ["MOB-009"],
+      "dependsOn": [
+        "MOB-009"
+      ],
       "acceptanceCriteria": [
         "Captura de fotos pela câmera ou galeria",
         "Salvamento de arquivo em cache local com fila de upload quando online"
@@ -138,7 +159,9 @@
       "title": "Painel de Status de Sincronização e Inspeção da Fila Outbox",
       "priority": 12,
       "status": "completed",
-      "dependsOn": ["MOB-005"],
+      "dependsOn": [
+        "MOB-005"
+      ],
       "acceptanceCriteria": [
         "Tela dedicada exibindo status da rede, itens pendentes na outbox e último sync",
         "Botão para forçar sincronização manual",
@@ -150,7 +173,11 @@
       "title": "Validação de Testes e Script de Verificação (verify.sh)",
       "priority": 13,
       "status": "completed",
-      "dependsOn": ["MOB-001", "MOB-005", "MOB-009"],
+      "dependsOn": [
+        "MOB-001",
+        "MOB-005",
+        "MOB-009"
+      ],
       "acceptanceCriteria": [
         "Testes unitários cobrindo o Sync Engine e repositório local",
         "scripts/verify.sh executa typecheck, lint e test com sucesso",
@@ -162,7 +189,9 @@
       "title": "Módulo Pedidos (ver + crear) — auditoría de paridad com web",
       "priority": 14,
       "status": "completed",
-      "dependsOn": ["MOB-013"],
+      "dependsOn": [
+        "MOB-013"
+      ],
       "acceptanceCriteria": [
         "services/orders.service.ts consumindo GET /orders, GET /orders/stats, POST /orders, PATCH/DELETE/PUT cancel",
         "Pantalla /pedidos: lista, detalle com itens, criação de pedido",
@@ -174,7 +203,9 @@
       "title": "Módulo Entregas (estado + entregar)",
       "priority": 14,
       "status": "completed",
-      "dependsOn": ["MOB-013"],
+      "dependsOn": [
+        "MOB-013"
+      ],
       "acceptanceCriteria": [
         "services/deliveries.service.ts consumindo GET /deliveries, PATCH /deliveries/:id/status, assign-driver, proof, create",
         "Pantalla /entregas: listado, badge de estado, avanço de estado até ENTREGUE",
@@ -186,7 +217,9 @@
       "title": "Módulo Clientes (lista + detalle)",
       "priority": 14,
       "status": "completed",
-      "dependsOn": ["MOB-013"],
+      "dependsOn": [
+        "MOB-013"
+      ],
       "acceptanceCriteria": [
         "services/clients.service.ts consumindo GET /clients, GET /clients/:id, PATCH, DELETE",
         "Pantalla /clientes: lista con búsqueda, detalle, badges statusLead",
@@ -198,7 +231,9 @@
       "title": "Módulo Estoque (disponibilidade)",
       "priority": 14,
       "status": "completed",
-      "dependsOn": ["MOB-013"],
+      "dependsOn": [
+        "MOB-013"
+      ],
       "acceptanceCriteria": [
         "services/stock.service.ts consumindo GET /stock/availability, POST /stock/movements",
         "Pantalla /estoque: tarjetas disponível/reservado/bloqueado, filtro client-side",
@@ -210,7 +245,12 @@
       "title": "Launcher de navegación /modules + tipos de módulos em types/index.ts",
       "priority": 14,
       "status": "completed",
-      "dependsOn": ["MOB-014", "MOB-015", "MOB-016", "MOB-017"],
+      "dependsOn": [
+        "MOB-014",
+        "MOB-015",
+        "MOB-016",
+        "MOB-017"
+      ],
       "acceptanceCriteria": [
         "Pantalla /modules con grid honesto (implementados navegam, resto 'Próximamente')",
         "Botão 'Módulos' no header do dashboard, rutas registradas no _layout",
@@ -222,7 +262,9 @@
       "title": "Módulos pendientes: Agenda, Empresas, Planejamento, Laboratório, Separação, Logística, Pós-venda, Fiscal, Métricas, Pesquisa, Equipe, Produtos/Unidades",
       "priority": 99,
       "status": "pending",
-      "dependsOn": ["MOB-018"],
+      "dependsOn": [
+        "MOB-018"
+      ],
       "acceptanceCriteria": [
         "Auditados y priorizados en iteración posterior"
       ]
@@ -232,7 +274,10 @@
       "title": "Task 1.2 — Carteira por região da vendedora + Check-in GPS + CRM offline/simplificado",
       "priority": 2,
       "status": "completed",
-      "dependsOn": ["MOB-013", "MOB-016"],
+      "dependsOn": [
+        "MOB-013",
+        "MOB-016"
+      ],
       "acceptanceCriteria": [
         "Login JWT com guard de rota e persistência de token (já existente, validado)",
         "services/regions.service.ts consumindo GET /regions (centerLat/centerLng/radiusKm opcionais) com fallback offline p/ DEFAULT_REGIONS",
@@ -241,6 +286,22 @@
         "Tela /checkin: marcacao nas fazendas com verificacao por regiao (expo-location)",
         "Arquivos soltos de outro agente (cadastro-cliente.tsx, useCadastroCliente.ts) removidos (protótipo não desplegável)",
         "Testes unitarios de regions/checkin verdes; verify.sh passa"
+      ]
+    },
+    {
+      "id": "MOB-021",
+      "title": "App comercial: Home enxuta, Pedidos (criar/acompanhar por setor) e Visitas com check-in GPS offline-first",
+      "priority": 1,
+      "status": "completed",
+      "dependsOn": [
+        "MOB-020"
+      ],
+      "acceptanceCriteria": [
+        "Home/menu destaca Pedidos, Visitas, Clientes",
+        "Pedido em 4 passos (POST /orders, MILHEIRO padrão)",
+        "Detalhe com GET /orders/:id/tracking e POST /orders/:id/close",
+        "Visita: PATCH /appointments/:id/checkin com outbox offline e 409 idempotente",
+        "verify.sh passa (57 suites / 368 testes)"
       ]
     }
   ]

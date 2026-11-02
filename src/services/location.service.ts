@@ -56,8 +56,10 @@ function toInput(pos: Location.LocationObject): ConfirmActivityInput {
  * → posição atual com timeout → fallback última posição conhecida.
  */
 export async function getCheckinCoords(
-  timeoutMs: number = CHECKIN_LOCATION_TIMEOUT_MS
+  timeoutMs: number = CHECKIN_LOCATION_TIMEOUT_MS,
+  options: { highAccuracy?: boolean; allowLastKnown?: boolean } = {}
 ): Promise<ConfirmActivityInput> {
+  const { highAccuracy = false, allowLastKnown = true } = options;
   const servicesOn = await Location.hasServicesEnabledAsync();
   if (!servicesOn) {
     throw new CheckinLocationError(
@@ -82,12 +84,15 @@ export async function getCheckinCoords(
 
   try {
     const position = await withTimeout(
-      Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+      Location.getCurrentPositionAsync({
+        accuracy: highAccuracy ? Location.Accuracy.High : Location.Accuracy.Balanced,
+      }),
       timeoutMs
     );
     return toInput(position);
   } catch {
-    const lastKnown = await Location.getLastKnownPositionAsync();
+    // Visita: posição antiga não vale como prova de presença, então não cai no cache.
+    const lastKnown = allowLastKnown ? await Location.getLastKnownPositionAsync() : null;
     if (lastKnown) {
       return toInput(lastKnown);
     }

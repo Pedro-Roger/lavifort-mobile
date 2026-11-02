@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
+  SectionList,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
@@ -12,24 +12,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
+import { getCheckinCoords, CheckinLocationError } from '@/services/location.service';
 import { Appointment } from '@/types';
 import { appointmentsService } from '@/services/appointments.service';
-import { AppointmentCard } from '@/components/appointments';
+import { AppointmentCard, groupVisits } from '@/components/appointments';
 import { Button } from '@/components/ui';
-
-type AgendaFilter = 'ALL' | 'REUNIAO' | 'VISITA';
-
-const FILTER_OPTIONS: { id: AgendaFilter; label: string }[] = [
-  { id: 'ALL', label: 'Todos' },
-  { id: 'REUNIAO', label: 'Reuniões' },
-  { id: 'VISITA', label: 'Visitas' },
-];
 
 /**
  * Tela de Agenda — compromissos e agendamentos de campo.
  *
- * Lista compromissos com filtros por tipo (Todos / Reuniões / Visitas),
- * ação de criar novo compromisso, editar e excluir.
+ * Visitas em Hoje / Próximas / Concluídas, com "Concluir visita" (GPS de alta
+ * precisão, offline-first via outbox) e selo de pendente de envio.
  */
 export default function AgendaScreen() {
   const router = useRouter();
@@ -37,13 +30,15 @@ export default function AgendaScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<AgendaFilter>('ALL');
+  const [pending, setPending] = useState<Record<string, string>>({});
+  const [concludingId, setConcludingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       setError(null);
-      const data = await appointmentsService.getAppointments();
+      setPending(await appointmentsService.getPendingCheckins());
+      const data = await appointmentsService.getAppointments({ tipo: 'VISITA' });
       setAppointments(data);
     } catch {
       setError('Não foi possível carregar os compromissos.');
@@ -62,10 +57,60 @@ export default function AgendaScreen() {
     load();
   }, [load]);
 
-  const filtered = useMemo(() => {
-    if (filter === 'ALL') return appointments;
-    return appointments.filter((a) => a.tipo === filter);
-  }, [appointments, filter]);
+  const sections = useMemo(() => groupVisits(appointments, pending), [appointments, pending]);
+  const total = appointments.length;
+
+  const ask = (title: string, message: string, ok: string) =>
+    new Promise<boolean>((resolve) =>
+      Alert.alert(title, message, [
+        { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+        { text: ok, onPress: () => resolve(true) },
+      ], { cancelable: true, onDismiss: () => resolve(false) }),
+    );
+
+  const handleConclude = async (appointment: Appointment) => {
+    const go = await ask(
+      'Concluir visita',
+      'Vamos usar a localização do seu aparelho (GPS) para registrar que você está no local da visita.',
+      'Continuar',
+    );
+    if (!go) return;
+    const tappedAt = new Date().toISOString();
+    setConcludingId(appointment.id);
+    try {
+      const coords = await getCheckinCoords(20000, { highAccuracy: true, allowLastKnown: false });
+      const confirmed = await ask(
+        'Confirmar conclusão',
+        `Localização obtida (precisão de ±${Math.round(coords.accuracyMeters)} m).\nConcluir "${appointment.titulo}" agora?`,
+        'Concluir',
+      );
+      if (!confirmed) return;
+      const result = await appointmentsService.concludeVisit(appointment.id, {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        accuracyMeters: coords.accuracyMeters,
+        clientTimestamp: tappedAt,
+      });
+      if (result.status === 'QUEUED') {
+        setPending((p) => ({ ...p, [appointment.id]: tappedAt }));
+        Alert.alert('Salva no aparelho', 'Sem internet: a conclusão será enviada automaticamente quando a conexão voltar.');
+      } else {
+        setAppointments((prev) =>
+          prev.map((a) =>
+            a.id === appointment.id ? (result.appointment ?? { ...a, concludedAt: tappedAt }) : a,
+          ),
+        );
+      }
+    } catch (err) {
+      const msg =
+        err instanceof CheckinLocationError
+          ? err.message
+          : 'Não foi possível concluir a visita. Tente novamente.';
+      Alert.alert('Não foi possível concluir', msg);
+    } finally {
+      setConcludingId(null);
+    }
+  };
 
   const handleDelete = (appointment: Appointment) => {
     Alert.alert(
@@ -120,18 +165,8 @@ export default function AgendaScreen() {
     }
     return (
       <View style={styles.stateContainer} testID="agenda-empty">
-        <Text style={styles.stateTitle}>
-          {filter === 'REUNIAO'
-            ? 'Nenhuma reunião'
-            : filter === 'VISITA'
-              ? 'Nenhuma visita'
-              : 'Nenhum compromisso'}
-        </Text>
-        <Text style={styles.stateHint}>
-          {filter === 'ALL'
-            ? 'Quando houver compromissos agendados, aparecerão aqui.'
-            : 'Tente outro filtro.'}
-        </Text>
+        <Text style={styles.stateTitle}>Nenhuma visita</Text>
+        <Text style={styles.stateHint}>Quando houver visitas agendadas, aparecerão aqui.</Text>
       </View>
     );
   };
@@ -150,7 +185,7 @@ export default function AgendaScreen() {
         >
           <Text style={styles.backButtonText}>‹ Voltar</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Agenda</Text>
+        <Text style={styles.headerTitle}>Visitas</Text>
 
         <TouchableOpacity
           testID="agenda-add-button"
@@ -164,50 +199,36 @@ export default function AgendaScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Filtros */}
-      <View style={styles.filters} testID="agenda-filters">
-        {FILTER_OPTIONS.map((option) => {
-          const isActive = filter === option.id;
-          return (
-            <TouchableOpacity
-              key={option.id}
-              testID={`agenda-filter-${option.id}`}
-              accessibilityRole="tab"
-              accessibilityLabel={`Filtro: ${option.label}`}
-              accessibilityState={{ selected: isActive }}
-              style={[styles.filterTab, isActive && styles.filterTabActive]}
-              onPress={() => setFilter(option.id)}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[styles.filterTabText, isActive && styles.filterTabTextActive]}
-              >
-                {option.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
       {/* Lista */}
-      <FlatList
-        data={filtered}
+      <SectionList
+        sections={total === 0 ? [] : sections.filter((x) => x.data.length > 0)}
         keyExtractor={(item) => item.id}
         style={styles.list}
+        stickySectionHeadersEnabled={false}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.sectionTitle}>
+            {section.title} ({section.data.length})
+          </Text>
+        )}
         renderItem={({ item }) => (
-          <AppointmentCard
-            key={`appointment-${item.id}`}
-            appointment={item}
-            isDeleting={deletingId === item.id}
-            onEdit={(appt) => router.push(`/agenda/form?id=${appt.id}` as any)}
-            onDelete={handleDelete}
-            testID={`appointment-card-${item.id}`}
-          />
+          <View style={styles.cardWrap}>
+            <AppointmentCard
+              key={`appointment-${item.id}`}
+              appointment={item}
+              isDeleting={deletingId === item.id}
+              isConcluding={concludingId === item.id}
+              pendingSince={pending[item.id]}
+              onConclude={handleConclude}
+              onEdit={(appt) => router.push(`/agenda/form?id=${appt.id}` as any)}
+              onDelete={handleDelete}
+              testID={`appointment-card-${item.id}`}
+            />
+          </View>
         )}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={[
           styles.listContent,
-          filtered.length === 0 && styles.listContentEmpty,
+          total === 0 && styles.listContentEmpty,
         ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -263,6 +284,15 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeights.semibold,
     color: colors.neutral.white,
   },
+  sectionTitle: {
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+    fontSize: typography.fontSizes.sm,
+    fontWeight: typography.fontWeights.bold,
+    color: colors.neutral.textSecondary,
+    textTransform: 'uppercase',
+  },
+  cardWrap: { marginBottom: spacing.md },
   filters: {
     flexDirection: 'row',
     gap: spacing.sm,

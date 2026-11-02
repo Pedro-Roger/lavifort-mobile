@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, typography, radii, minTouchTarget } from '@/core/theme';
 import { Order, CreateOrderInput } from '@/types';
 import { ordersService } from '@/services/orders.service';
-import { OrderCard, OrderDetail, CreateOrderModal } from '@/components/orders';
+import { OrderCard, CreateOrderModal } from '@/components/orders';
 
 export default function PedidosScreen() {
   const router = useRouter();
@@ -13,8 +13,6 @@ export default function PedidosScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
@@ -37,8 +35,7 @@ export default function PedidosScreen() {
   };
 
   const handleOrderPress = (order: Order) => {
-    setSelectedOrder(order);
-    setIsDetailOpen(true);
+    router.push({ pathname: '/pedido-detalhe', params: { id: order.id } } as any);
   };
 
   const handleSearchClients = async (search: string) => ordersService.getClients(search);
@@ -135,16 +132,6 @@ export default function PedidosScreen() {
         />
       )}
 
-      {/* Detail */}
-      <OrderDetailModal
-        order={selectedOrder}
-        visible={isDetailOpen}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedOrder(null);
-        }}
-      />
-
       {/* Create */}
       <CreateOrderModal
         visible={isCreateOpen}
@@ -153,29 +140,6 @@ export default function PedidosScreen() {
         onCreateOrder={handleCreateOrder}
       />
     </SafeAreaView>
-  );
-}
-
-function OrderDetailModal({ order, visible, onClose }: { order: Order | null; visible: boolean; onClose: () => void }) {
-  if (!visible || !order) return null;
-  return (
-    <View style={styles.detailOverlay} testID="pedidos-detail-overlay">
-      <TouchableOpacity style={styles.detailBackdrop} onPress={onClose} activeOpacity={1}>
-        <View />
-      </TouchableOpacity>
-      <View style={styles.detailSheet}>
-        <TouchableOpacity
-          onPress={onClose}
-          style={styles.detailClose}
-          accessibilityRole="button"
-          accessibilityLabel="Fechar detalhe"
-          testID="pedidos-detail-close"
-        >
-          <Text style={styles.detailCloseText}>✕</Text>
-        </TouchableOpacity>
-        <OrderDetail order={order} testID="pedidos-detail" />
-      </View>
-    </View>
   );
 }
 

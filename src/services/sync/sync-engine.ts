@@ -3,6 +3,7 @@ import { outboxQueue, OutboxQueue } from './outbox-queue';
 import { localDatabase, LocalDatabase } from './local-database';
 import { networkMonitor, NetworkMonitor } from './network-monitor';
 import { tasksService as defaultTasksService } from '../tasks.service';
+import { appointmentsService } from '../appointments.service';
 import { attachmentService as defaultAttachmentService, AttachmentService } from '../attachment.service';
 import {
   CreateTaskDTO,
@@ -252,6 +253,21 @@ export class SyncEngine {
           break;
         }
       }
+    } else if (entityType === 'APPOINTMENT') {
+      if (action === 'CHECKIN') {
+        try {
+          await appointmentsService.sendCheckin(entityId, {
+            latitude: Number(payload.latitude),
+            longitude: Number(payload.longitude),
+            accuracyMeters: Number(payload.accuracyMeters ?? 0),
+            clientTimestamp: String(payload.clientTimestamp),
+          });
+        } catch (err) {
+          // 409 = já concluída no servidor: idempotente.
+          if (this.isConflictError(err)) return;
+          throw err;
+        }
+      }
     } else if (entityType === 'ATTACHMENT') {
       const taskId = String(payload.taskId || '');
       const attachmentId = String(payload.attachmentId || entityId);
@@ -409,6 +425,10 @@ export class SyncEngine {
       return status === 400 || status === 422;
     }
     return false;
+  }
+
+  private isConflictError(err: unknown): boolean {
+    return (err as AxiosError)?.response?.status === 409;
   }
 
   private is404Error(err: unknown): boolean {
