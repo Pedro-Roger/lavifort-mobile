@@ -113,3 +113,18 @@ describe('ClientsService', () => {
     expect(apiClient.delete).toHaveBeenCalledWith('/clients/c-1');
   });
 });
+describe('clientsService.saveClientLocation', () => {
+  it('PATCH /clients/:id com lat/lng', async () => {
+    (apiClient.patch as jest.Mock).mockResolvedValue({ data: { id: 'c-1', latitude: -3.73, longitude: -38.52 } });
+    const r = await clientsService.saveClientLocation('c-1', -3.73, -38.52);
+    expect(apiClient.patch).toHaveBeenCalledWith('/clients/c-1', { latitude: -3.73, longitude: -38.52 });
+    expect(r.id).toBe('c-1');
+  });
+
+  it('rejeita coordenadas fora da faixa sem chamar a API', async () => {
+    (apiClient.patch as jest.Mock).mockClear();
+    await expect(clientsService.saveClientLocation('c-1', 91, 0)).rejects.toThrow();
+    await expect(clientsService.saveClientLocation('c-1', 0, NaN)).rejects.toThrow();
+    expect(apiClient.patch).not.toHaveBeenCalled();
+  });
+});

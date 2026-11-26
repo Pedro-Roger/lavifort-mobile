@@ -39,6 +39,7 @@ export default function CheckinScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [history, setHistory] = useState<CheckinRecord[]>([]);
   const [checkingId, setCheckingId] = useState<string | null>(null);
+  const [savingLocationId, setSavingLocationId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -145,6 +146,38 @@ export default function CheckinScreen() {
     }
   };
 
+  const handleSaveLocation = async (client: Cliente) => {
+    setSavingLocationId(client.id);
+    try {
+      // Sem cache: posição antiga gravaria o ponto errado no cliente.
+      const c = await getCheckinCoords(undefined, { highAccuracy: true, allowLastKnown: false });
+      Alert.alert(
+        'Salvar localização do cliente',
+        `Lat ${c.latitude.toFixed(6)}, Lng ${c.longitude.toFixed(6)}\nPrecisão: ±${Math.round(c.accuracyMeters)} m`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Salvar',
+            onPress: async () => {
+              try {
+                const updated = await clientsService.saveClientLocation(client.id, c.latitude, c.longitude);
+                setClients((prev) => prev.map((x) => (x.id === client.id ? { ...x, ...updated } : x)));
+                Alert.alert('Sucesso', 'Localização do cliente salva.');
+              } catch {
+                // shortcut: sem fila offline para PATCH de cliente; usuário repete com sinal.
+                Alert.alert('Erro', 'Não foi possível salvar. Verifique a conexão e tente novamente.');
+              }
+            },
+          },
+        ],
+      );
+    } catch (err: unknown) {
+      Alert.alert('Localização', err instanceof CheckinLocationError ? err.message : 'Não foi possível obter a localização.');
+    } finally {
+      setSavingLocationId(null);
+    }
+  };
+
   const handleSync = async () => {
     try {
       const result = await checkinService.syncPendingCheckins();
@@ -169,6 +202,15 @@ export default function CheckinScreen() {
         isLoading={checkingId === item.id}
         disabled={!selectedRegion}
         testID={`checkin-button-${item.id}`}
+        style={styles.checkinButton}
+      />
+      <Button
+        title="Salvar localização do cliente"
+        variant="secondary"
+        size="sm"
+        onPress={() => handleSaveLocation(item)}
+        isLoading={savingLocationId === item.id}
+        testID={`checkin-save-location-${item.id}`}
         style={styles.checkinButton}
       />
     </View>

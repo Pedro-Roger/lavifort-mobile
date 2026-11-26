@@ -418,6 +418,8 @@ export interface Cliente {
   qtdBercarios: number;
   volumeBercarios: number;
   alimentadorAutomatico: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -108,6 +108,14 @@ export const clientsService = {
     return normalizeClient(normalizeApiResponse(response.data));
   },
 
+  /** PATCH /clients/:id com lat/lng. Valida faixa antes de enviar (API rejeita fora). */
+  async saveClientLocation(id: string, latitude: number, longitude: number): Promise<Cliente> {
+    if (!(Math.abs(latitude) <= 90) || !(Math.abs(longitude) <= 180)) {
+      throw new Error('Coordenadas inválidas.');
+    }
+    return this.updateClient(id, { latitude, longitude });
+  },
+
   async deleteClient(id: string): Promise<void> {
     await apiClient.delete(`/clients/${id}`);
   },
